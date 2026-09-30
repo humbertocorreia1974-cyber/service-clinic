@@ -1,5 +1,6 @@
 const STATUS_MAP: Record<string, { label: string; cls: string }> = {
   aberta: { label: "Aberta", cls: "bg-brand/10 text-brand border-brand/30" },
+  a_caminho: { label: "A caminho", cls: "bg-accent/10 text-accent border-accent/30" },
   em_andamento: { label: "Em andamento", cls: "bg-accent/10 text-accent border-accent/30" },
   concluida: { label: "Concluída", cls: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" },
   cancelada: { label: "Cancelada", cls: "bg-red-500/10 text-red-400 border-red-500/30" },
