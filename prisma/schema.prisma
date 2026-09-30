@@ -1,0 +1,741 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  termsAcceptedAt          DateTime?
+  id                       String                 @id @default(cuid())
+  name                     String?
+  email                    String                 @unique
+  passwordHash             String
+  plan                     String                 @default("free")
+  // 🩹 2026-09-01: apps com múltiplos papéis (jogador/dono, recepção/vet/admin…)
+  // faziam `prisma.user.findMany({ where: { role } })` e o build quebrava
+  // (TS2353: 'role' não existe em UserWhereInput). Agora a fundação tem o campo.
+  role                     String                 @default("user")
+  stripeCustomerId         String?
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
+  projects                 Project[]
+  serviceOrder_createdBys  ServiceOrder[]         @relation("ServiceOrderCreatedBy")
+  serviceOrder_assignedTos ServiceOrder[]         @relation("ServiceOrderTechnician")
+  visit_createdBys         Visit[]                @relation("VisitCreatedBy")
+  visit_assignedTos        Visit[]                @relation("VisitTechnician")
+  laudo_createdBys         Laudo[]                @relation("LaudoCreatedBy")
+  laudo_signedBys          Laudo[]                @relation("LaudoSignedBy")
+  client                   Client?
+  technician               Technician?
+  contracts                Contract[]             @relation("ContractCreatedBy")
+  payments                 Payment[]              @relation("PaymentRegisteredBy")
+  stockMovements           StockMovement[]
+  leads                    Lead[]                 @relation("LeadAssignedTo")
+  notifications            Notification[]
+  auditLogs                AuditLog[]             @relation("AuditActor")
+  medicalRecords           MedicalRecord[]        @relation("MedicalRecordAuthor")
+  medicalRecordAccesss     MedicalRecordAccess[]  @relation("MedicalRecordAccessUser")
+  documents                Document[]             @relation("DocumentUploadedBy")
+  professional             Professional?
+  vaccinations             Vaccination[]          @relation("VaccinationAppliedBy")
+  controlledMedications    ControlledMedication[] @relation("ControlledMedicationPrescriber")
+  blogPosts                BlogPost[]             @relation("BlogPostAuthor")
+  consents                 Consent[]              @relation("ConsentUser")
+  clientId                 String?
+  technicianId             String?
+  professionalId           String?
+}
+
+model Project {
+  id        String   @id @default(cuid())
+  name      String
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([ownerId])
+}
+
+model Client {
+  id                String   @id @default(cuid())
+  userId            String?  @unique
+  user              User?    @relation(fields: [userId], references: [id])
+  razaoSocial       String
+  nomeFantasia      String
+  cnpj              String?  @unique
+  email             String
+  phone             String
+  whatsapp          String?
+  addressStreet     String?
+  addressNumber     String?
+  addressComplement String?
+  addressDistrict   String?
+  addressCity       String
+  addressState      String   @default("RJ")
+  addressZip        String?
+  latitude          Float?
+  longitude         Float?
+  notes             String?
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  equipments      Equipment[]
+  serviceOrders   ServiceOrder[]
+  contracts       Contract[]
+  visits          Visit[]
+  invoices        Invoice[]
+  leads           Lead[]
+  laudos          Laudo[]
+  insurancePlan   InsurancePlan?  @relation(fields: [insurancePlanId], references: [id])
+  insurancePlanId String?
+  medicalRecords  MedicalRecord[]
+  documents       Document[]
+  patients        Patient[]
+  appointments    Appointment[]
+  consents        Consent[]
+
+  @@index([insurancePlanId])
+}
+
+model Technician {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  phone       String
+  email       String
+  cities      String[] // cidades do Sul Fluminense atendidas
+  specialties String[]
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  serviceOrders ServiceOrder[]
+  visits        Visit[]
+}
+
+model Equipment {
+  id               String    @id @default(cuid())
+  clientId         String
+  client           Client    @relation(fields: [clientId], references: [id])
+  category         String // cadeira_odontologica | autoclave | compressor | raio_x | fotopolimerizador | outro
+  brand            String
+  model            String
+  serialNumber     String
+  installationDate DateTime?
+  warrantyUntil    DateTime?
+  location         String?
+  notes            String?
+  active           Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  serviceOrders  ServiceOrder[]
+  contracts      Contract[]
+  laudos         Laudo[]
+  medicalRecords MedicalRecord[]
+
+  @@index([clientId])
+}
+
+model ServiceOrder {
+  id           String      @id @default(cuid())
+  code         String      @unique
+  clientId     String
+  client       Client      @relation(fields: [clientId], references: [id])
+  equipmentId  String?
+  equipment    Equipment?  @relation(fields: [equipmentId], references: [id])
+  technicianId String?
+  technician   Technician? @relation(fields: [technicianId], references: [id])
+  createdById  String
+  createdBy    User        @relation("ServiceOrderCreatedBy", fields: [createdById], references: [id])
+  assignedToId String?
+  assignedTo   User?       @relation("ServiceOrderTechnician", fields: [assignedToId], references: [id])
+  type         String // preventiva | corretiva | higienizacao_ac | instalacao | venda_peca
+  status       String      @default("aberta") // aberta | em_andamento | concluida | cancelada
+  priority     String      @default("normal") // baixa | normal | alta | urgente
+  description  String?
+  diagnosis    String?
+  solution     String?
+  scheduledAt  DateTime?
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  city         String
+  address      String?
+  totalValue   Decimal?    @db.Decimal(10, 2)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  checklists     ServiceOrderChecklist[]
+  photos         ServiceOrderPhoto[]
+  signatures     ServiceOrderSignature[]
+  laudos         Laudo[]
+  stockMovements StockMovement[]
+  invoiceItems   InvoiceItem[]
+  medicalRecords MedicalRecord[]
+  documents      Document[]
+
+  @@index([clientId])
+  @@index([equipmentId])
+  @@index([technicianId])
+  @@index([createdById])
+  @@index([assignedToId])
+}
+
+model ServiceOrderChecklist {
+  id             String       @id @default(cuid())
+  serviceOrderId String
+  serviceOrder   ServiceOrder @relation(fields: [serviceOrderId], references: [id], onDelete: Cascade)
+  itemKey        String
+  itemLabel      String
+  itemGroup      String? // ex: biosseguranca, eletrica, mecanica
+  done           Boolean      @default(false)
+  notes          String?
+  order          Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([serviceOrderId])
+}
+
+model ServiceOrderPhoto {
+  id             String       @id @default(cuid())
+  serviceOrderId String
+  serviceOrder   ServiceOrder @relation(fields: [serviceOrderId], references: [id], onDelete: Cascade)
+  url            String
+  kind           String // antes | depois | laudo | outro
+  caption        String?
+  uploadedById   String?
+  createdAt      DateTime     @default(now())
+
+  @@index([serviceOrderId])
+}
+
+model ServiceOrderSignature {
+  id             String       @id @default(cuid())
+  serviceOrderId String
+  serviceOrder   ServiceOrder @relation(fields: [serviceOrderId], references: [id], onDelete: Cascade)
+  signerName     String
+  signerDocument String?
+  signatureData  String // base64 ou URL do SVG/PNG
+  signedAt       DateTime     @default(now())
+  ipAddress      String?
+  userAgent      String?
+
+  @@index([serviceOrderId])
+}
+
+model Contract {
+  id              String     @id @default(cuid())
+  code            String     @unique
+  clientId        String
+  client          Client     @relation(fields: [clientId], references: [id])
+  equipmentId     String?
+  equipment       Equipment? @relation(fields: [equipmentId], references: [id])
+  createdById     String
+  createdBy       User       @relation("ContractCreatedBy", fields: [createdById], references: [id])
+  title           String
+  description     String?
+  periodicity     String // mensal | bimestral | trimestral | semestral | anual
+  value           Decimal    @db.Decimal(10, 2)
+  startDate       DateTime
+  endDate         DateTime?
+  nextVisitAt     DateTime?
+  alertDaysBefore Int        @default(7)
+  status          String     @default("ativo") // ativo | suspenso | encerrado
+  autoRenew       Boolean    @default(true)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  visits   Visit[]
+  invoices Invoice[]
+
+  @@index([clientId])
+  @@index([equipmentId])
+  @@index([createdById])
+}
+
+model Visit {
+  id           String      @id @default(cuid())
+  clientId     String
+  client       Client      @relation(fields: [clientId], references: [id])
+  contractId   String?
+  contract     Contract?   @relation(fields: [contractId], references: [id])
+  technicianId String?
+  technician   Technician? @relation(fields: [technicianId], references: [id])
+  createdById  String
+  createdBy    User        @relation("VisitCreatedBy", fields: [createdById], references: [id])
+  assignedToId String?
+  assignedTo   User?       @relation("VisitTechnician", fields: [assignedToId], references: [id])
+  scheduledAt  DateTime
+  durationMin  Int         @default(60)
+  city         String
+  address      String?
+  status       String      @default("agendada") // agendada | confirmada | realizada | cancelada | remarcada
+  confirmedAt  DateTime?
+  confirmedVia String? // whatsapp | email | telefone
+  notes        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([clientId])
+  @@index([contractId])
+  @@index([technicianId])
+  @@index([createdById])
+  @@index([assignedToId])
+}
+
+model Invoice {
+  id         String    @id @default(cuid())
+  number     String    @unique
+  clientId   String
+  client     Client    @relation(fields: [clientId], references: [id])
+  contractId String?
+  contract   Contract? @relation(fields: [contractId], references: [id])
+  issueDate  DateTime  @default(now())
+  dueDate    DateTime
+  paidAt     DateTime?
+  subtotal   Decimal   @db.Decimal(10, 2)
+  discount   Decimal   @default(0) @db.Decimal(10, 2)
+  total      Decimal   @db.Decimal(10, 2)
+  status     String    @default("pendente") // pendente | paga | atrasada | cancelada
+  notes      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  items    InvoiceItem[]
+  payments Payment[]
+
+  @@index([clientId])
+  @@index([contractId])
+}
+
+model InvoiceItem {
+  id             String        @id @default(cuid())
+  invoiceId      String
+  invoice        Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  serviceOrderId String?
+  serviceOrder   ServiceOrder? @relation(fields: [serviceOrderId], references: [id])
+  description    String
+  quantity       Int           @default(1)
+  unitPrice      Decimal       @db.Decimal(10, 2)
+  total          Decimal       @db.Decimal(10, 2)
+  kind           String        @default("servico") // servico | peca | contrato
+  createdAt      DateTime      @default(now())
+
+  @@index([invoiceId])
+  @@index([serviceOrderId])
+}
+
+model Payment {
+  id             String   @id @default(cuid())
+  invoiceId      String
+  invoice        Invoice  @relation(fields: [invoiceId], references: [id])
+  registeredById String?
+  registeredBy   User?    @relation("PaymentRegisteredBy", fields: [registeredById], references: [id])
+  amount         Decimal  @db.Decimal(10, 2)
+  method         String // pix | boleto | cartao | dinheiro | transferencia
+  paidAt         DateTime @default(now())
+  reference      String?
+  notes          String?
+  createdAt      DateTime @default(now())
+
+  @@index([invoiceId])
+  @@index([registeredById])
+}
+
+model Part {
+  id             String   @id @default(cuid())
+  sku            String   @unique
+  name           String
+  description    String?
+  category       String // cadeira | autoclave | compressor | raio_x | fotopolimerizador | geral
+  brand          String?
+  compatibleWith String[]
+  costPrice      Decimal  @db.Decimal(10, 2)
+  salePrice      Decimal  @db.Decimal(10, 2)
+  stockQty       Int      @default(0)
+  minStockQty    Int      @default(0)
+  unit           String   @default("un")
+  imageUrl       String?
+  publicVisible  Boolean  @default(true)
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  stockMovements StockMovement[]
+}
+
+model StockMovement {
+  id             String        @id @default(cuid())
+  partId         String
+  part           Part          @relation(fields: [partId], references: [id])
+  serviceOrderId String?
+  serviceOrder   ServiceOrder? @relation(fields: [serviceOrderId], references: [id])
+  userId         String?
+  user           User?         @relation(fields: [userId], references: [id])
+  kind           String // entrada | saida_venda | saida_os | ajuste
+  quantity       Int
+  unitCost       Decimal?      @db.Decimal(10, 2)
+  reason         String?
+  createdAt      DateTime      @default(now())
+
+  @@index([partId])
+  @@index([serviceOrderId])
+  @@index([userId])
+}
+
+model Lead {
+  id           String   @id @default(cuid())
+  name         String
+  email        String?
+  phone        String
+  city         String
+  source       String // site_home | servico | catalogo_pecas | contato | blog | whatsapp
+  subject      String?
+  message      String?
+  partId       String?
+  clientId     String?
+  client       Client?  @relation(fields: [clientId], references: [id])
+  assignedToId String?
+  assignedTo   User?    @relation("LeadAssignedTo", fields: [assignedToId], references: [id])
+  status       String   @default("novo") // novo | contatado | qualificado | convertido | perdido
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([assignedToId])
+}
+
+model Laudo {
+  id             String        @id @default(cuid())
+  code           String        @unique
+  serviceOrderId String?
+  serviceOrder   ServiceOrder? @relation(fields: [serviceOrderId], references: [id])
+  clientId       String
+  client         Client        @relation(fields: [clientId], references: [id])
+  equipmentId    String?
+  equipment      Equipment?    @relation(fields: [equipmentId], references: [id])
+  createdById    String
+  createdBy      User          @relation("LaudoCreatedBy", fields: [createdById], references: [id])
+  signedById     String?
+  signedBy       User?         @relation("LaudoSignedBy", fields: [signedById], references: [id])
+  type           String // higienizacao_ac | pmoc | biosseguranca | tecnico
+  title          String
+  content        Json // estrutura do laudo (itens, medições, observações)
+  pdfUrl         String?
+  signatureData  String?
+  signedAt       DateTime?
+  validUntil     DateTime?
+  status         String        @default("rascunho") // rascunho | emitido | assinado | arquivado
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  documents      Document[]
+
+  @@index([serviceOrderId])
+  @@index([clientId])
+  @@index([equipmentId])
+  @@index([createdById])
+  @@index([signedById])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  kind      String // os_atribuida | preventiva_vencendo | pagamento_recebido | lead_novo | laudo_emitido | sistema
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation("AuditActor", fields: [actorId], references: [id])
+  action    String // create | read | update | delete | login | export
+  entity    String // ServiceOrder | Client | Equipment | Laudo | MedicalRecord | User | etc
+  entityId  String?
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  medicalRecordAccesses MedicalRecordAccess[]
+
+  @@index([actorId])
+}
+
+model MedicalRecord {
+  id             String        @id @default(cuid())
+  clientId       String
+  client         Client        @relation(fields: [clientId], references: [id])
+  equipmentId    String?
+  equipment      Equipment?    @relation(fields: [equipmentId], references: [id])
+  serviceOrderId String?
+  serviceOrder   ServiceOrder? @relation(fields: [serviceOrderId], references: [id])
+  authorId       String
+  author         User          @relation("MedicalRecordAuthor", fields: [authorId], references: [id])
+  title          String
+  content        String // texto clínico/técnico — criptografado em repouso na aplicação
+  attachments    Json? // URLs de exames criptografados
+  consentGivenAt DateTime?
+  consentGivenBy String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  accesses  MedicalRecordAccess[]
+  patient   Patient?              @relation(fields: [patientId], references: [id])
+  patientId String?
+
+  @@index([clientId])
+  @@index([equipmentId])
+  @@index([serviceOrderId])
+  @@index([authorId])
+  @@index([patientId])
+}
+
+model MedicalRecordAccess {
+  id              String        @id @default(cuid())
+  medicalRecordId String
+  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User          @relation("MedicalRecordAccessUser", fields: [userId], references: [id])
+  auditLogId      String?
+  auditLog        AuditLog?     @relation(fields: [auditLogId], references: [id])
+  action          String // view | edit | export | print
+  ipAddress       String?
+  createdAt       DateTime      @default(now())
+
+  @@index([medicalRecordId])
+  @@index([userId])
+  @@index([auditLogId])
+}
+
+model Document {
+  id             String        @id @default(cuid())
+  clientId       String?
+  client         Client?       @relation(fields: [clientId], references: [id])
+  serviceOrderId String?
+  serviceOrder   ServiceOrder? @relation(fields: [serviceOrderId], references: [id])
+  laudoId        String?
+  laudo          Laudo?        @relation(fields: [laudoId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?         @relation("DocumentUploadedBy", fields: [uploadedById], references: [id])
+  name           String
+  mimeType       String
+  sizeBytes      Int
+  url            String
+  encrypted      Boolean       @default(true)
+  kind           String // exame | contrato | laudo | nota_fiscal | outro
+  createdAt      DateTime      @default(now())
+
+  @@index([clientId])
+  @@index([serviceOrderId])
+  @@index([laudoId])
+  @@index([uploadedById])
+}
+
+model InsurancePlan {
+  id            String   @id @default(cuid())
+  name          String
+  provider      String
+  code          String?  @unique
+  coverageNotes String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  clients Client[]
+}
+
+model Specialty {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  professionals Professional[]
+}
+
+model Professional {
+  id           String     @id @default(cuid())
+  userId       String?    @unique
+  user         User?      @relation(fields: [userId], references: [id])
+  specialtyId  String?
+  specialty    Specialty? @relation(fields: [specialtyId], references: [id])
+  name         String
+  registration String? // registro profissional / CREA / CRT
+  phone        String?
+  email        String?
+  active       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  appointments Appointment[]
+
+  @@index([specialtyId])
+}
+
+model Patient {
+  id         String    @id @default(cuid())
+  clientId   String
+  client     Client    @relation(fields: [clientId], references: [id])
+  name       String
+  species    String? // cão | gato | outro (quando aplicável)
+  breed      String?
+  birthDate  DateTime?
+  tutorName  String?
+  tutorPhone String?
+  notes      String?
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  appointments          Appointment[]
+  medicalRecords        MedicalRecord[]
+  vaccinations          Vaccination[]
+  controlledMedications ControlledMedication[]
+
+  @@index([clientId])
+}
+
+model Appointment {
+  id             String        @id @default(cuid())
+  clientId       String
+  client         Client        @relation(fields: [clientId], references: [id])
+  patientId      String?
+  patient        Patient?      @relation(fields: [patientId], references: [id])
+  professionalId String?
+  professional   Professional? @relation(fields: [professionalId], references: [id])
+  scheduledAt    DateTime
+  durationMin    Int           @default(30)
+  status         String        @default("agendado") // agendado | confirmado | realizado | cancelado | faltou
+  reason         String?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([clientId])
+  @@index([patientId])
+  @@index([professionalId])
+}
+
+model Vaccination {
+  id          String    @id @default(cuid())
+  patientId   String
+  patient     Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  vaccineName String
+  batchNumber String?
+  appliedAt   DateTime
+  nextDoseAt  DateTime?
+  appliedById String?
+  appliedBy   User?     @relation("VaccinationAppliedBy", fields: [appliedById], references: [id])
+  notes       String?
+  createdAt   DateTime  @default(now())
+
+  @@index([patientId])
+  @@index([appliedById])
+}
+
+model ControlledMedication {
+  id                 String    @id @default(cuid())
+  patientId          String
+  patient            Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  prescribedById     String
+  prescribedBy       User      @relation("ControlledMedicationPrescriber", fields: [prescribedById], references: [id])
+  medicationName     String
+  dosage             String
+  quantity           String
+  prescriptionNumber String    @unique
+  issuedAt           DateTime  @default(now())
+  validUntil         DateTime?
+  notes              String?
+  createdAt          DateTime  @default(now())
+
+  @@index([patientId])
+  @@index([prescribedById])
+}
+
+model BlogPost {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  excerpt         String?
+  content         String
+  coverImageUrl   String?
+  serviceSlug     String?
+  citySlug        String?
+  metaTitle       String?
+  metaDescription String?
+  published       Boolean   @default(false)
+  publishedAt     DateTime?
+  authorId        String?
+  author          User?     @relation("BlogPostAuthor", fields: [authorId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([authorId])
+}
+
+model Service {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  name             String
+  shortDescription String?
+  longDescription  String?
+  icon             String?
+  order            Int      @default(0)
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model City {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  state     String   @default("RJ")
+  latitude  Float?
+  longitude Float?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Consent {
+  id        String    @id @default(cuid())
+  userId    String?
+  user      User?     @relation("ConsentUser", fields: [userId], references: [id])
+  clientId  String?
+  client    Client?   @relation(fields: [clientId], references: [id])
+  purpose   String // termos_uso | politica_privacidade | dado_saude | marketing | cookies
+  granted   Boolean   @default(true)
+  grantedAt DateTime  @default(now())
+  revokedAt DateTime?
+  ipAddress String?
+  userAgent String?
+
+  @@index([userId])
+  @@index([clientId])
+}
+
+model HealthCheck {
+  id        String   @id @default(cuid())
+  service   String // backend | database | whatsapp | email | storage
+  status    String // ok | degraded | down
+  latencyMs Int?
+  message   String?
+  checkedAt DateTime @default(now())
+}
