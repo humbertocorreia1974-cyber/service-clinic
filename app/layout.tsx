@@ -15,7 +15,6 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Service Clinic — Manutenção especializada para consultórios odontológicos",
   description: "Manutenção preventiva e corretiva de equipamentos odontológicos, higienização de ar-condicionado com laudo PMOC e revenda de peças. Atendemos Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
-  icons: { icon: "/logo.svg" },
   openGraph: {
     title: "Service Clinic",
     description: "Manutenção especializada para consultórios odontológicos no Sul Fluminense.",
