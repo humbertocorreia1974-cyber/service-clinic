@@ -33,7 +33,7 @@ export default function Home() {
     hero: L.hero || {},
     features: Array.isArray(L.features) ? L.features : [],
     steps: Array.isArray(L.steps) ? L.steps : [],
-    pricing: Array.isArray(L.pricing) ? L.pricing : [],
+    agenda: Array.isArray(L.agenda) ? L.agenda : [],
     testimonials: Array.isArray(L.testimonials) ? L.testimonials : [],
     faq: Array.isArray(L.faq) ? L.faq : [],
     cta: L.cta || {},
@@ -41,12 +41,11 @@ export default function Home() {
 
   // os 3 pilares reais do negócio (primeiros 3 itens de features) ganham foto;
   // os secundários (laudos, agenda, cobertura) ficam como faixa compacta abaixo.
-  const pillars = l.features.slice(0, 3);
-  const secondary = l.features.slice(3);
-  const pillarPhotos = ["/photos/dental-tools.jpg", "/photos/ac-tech.jpg", "/photos/tools-tray.jpg"];
+  const pillars = l.features.slice(0, 2);
+  const secondary = l.features.slice(2);
+  const pillarPhotos = ["/photos/dental-tools.jpg", "/photos/tools-tray.jpg"];
   const pillarAlt = [
     "Instrumental odontológico em manutenção",
-    "Técnico realizando higienização de ar-condicionado",
     "Peças e instrumentos organizados para reposição",
   ];
 
@@ -59,7 +58,7 @@ export default function Home() {
         </span>
         <nav className="flex items-center gap-1">
           <Link href="#pilares"><Button variant="ghost" size="sm">Serviços</Button></Link>
-          {l.pricing?.length ? <Link href="#pricing"><Button variant="ghost" size="sm">Preços</Button></Link> : null}
+          {l.agenda?.length ? <Link href="#agenda"><Button variant="ghost" size="sm">Agenda</Button></Link> : null}
           <Link href={l.hero.ctaHref ?? "#contato"}><Button size="sm">{l.hero.cta || "Começar"}</Button></Link>
         </nav>
       </header>
@@ -160,40 +159,20 @@ export default function Home() {
         </section>
       ) : null}
 
-      {/* PRICING */}
-      {l.pricing?.length ? (
-        <section id="pricing" className="mx-auto max-w-5xl px-6 pb-24">
-          <h2 className="text-center text-2xl font-semibold tracking-tight">Planos</h2>
+      {/* AGENDA — marcação automática, taxa de deslocamento, tempo médio (não é "planos") */}
+      {l.agenda?.length ? (
+        <section id="agenda" className="mx-auto max-w-5xl px-6 pb-24">
+          <h2 className="text-center text-2xl font-semibold tracking-tight">Como funciona o atendimento</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            {l.pricing.map((pr: any, pi: number) => {
-              const highlight = pr.highlight ?? pi === 1;
-              return (
-                <div
-                  key={pr.name || pi}
-                  className={`rounded-lg border p-6 ${highlight ? "border-brand bg-surface" : "border-border bg-surface/60"}`}
-                >
-                  <h3 className="text-sm font-semibold text-fg">{pr.name || `Plano ${pi + 1}`}</h3>
-                  <div className="mt-3 flex items-baseline gap-1">
-                    <span className="text-3xl font-semibold text-fg">{pr.price ?? ""}</span>
-                    {pr.period ? <span className="text-sm text-fg-muted">{pr.period}</span> : null}
-                  </div>
-                  {pr.description ? <p className="mt-2 text-sm text-fg-muted">{pr.description}</p> : null}
-                  <ul className="mt-5 space-y-2">
-                    {(Array.isArray(pr.features) ? pr.features : []).map((feat: string, fi: number) => (
-                      <li key={fi} className="flex items-start gap-2 text-sm text-fg-muted">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
-                        {feat}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={pr.href ?? "#contato"} className="mt-6 block">
-                    <Button variant={highlight ? "primary" : "secondary"} className="w-full">
-                      {pr.cta || pr.button || `Escolher ${pr.name || "plano"}`}
-                    </Button>
-                  </Link>
+            {l.agenda.map((a: any, ai: number) => (
+              <div key={a.title || ai} className="rounded-lg border border-border bg-surface/60 p-6">
+                <div className="inline-flex rounded-lg border border-border bg-bg p-2.5">
+                  <Icons.CalendarClock className="h-5 w-5 text-brand" />
                 </div>
-              );
-            })}
+                <h3 className="mt-4 text-sm font-semibold text-fg">{a.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-fg-muted">{a.body}</p>
+              </div>
+            ))}
           </div>
         </section>
       ) : null}
