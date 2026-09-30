@@ -52,7 +52,7 @@ export async function GET(request: Request) {
       prisma.visit.findMany({
         where: {
           technicianId: { in: technicianIds },
-          status: { in: ["agendada", "confirmada"] },
+          status: { in: ["agendada", "confirmada", "a_caminho"] },
           scheduledAt: { gte: today, lt: rangeEnd },
         },
         select: { technicianId: true, scheduledAt: true, durationMin: true },
@@ -60,7 +60,7 @@ export async function GET(request: Request) {
       prisma.serviceOrder.findMany({
         where: {
           technicianId: { in: technicianIds },
-          status: { in: ["aberta", "em_andamento"] },
+          status: { in: ["aberta", "a_caminho", "em_andamento"] },
           scheduledAt: { gte: today, lt: rangeEnd },
         },
         select: { technicianId: true, scheduledAt: true },
