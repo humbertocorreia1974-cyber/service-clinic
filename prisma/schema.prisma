@@ -407,6 +407,7 @@ model Lead {
   assignedTo   User?    @relation("LeadAssignedTo", fields: [assignedToId], references: [id])
   status       String   @default("novo") // novo | contatado | qualificado | convertido | perdido
   notes        String?
+  preferredAt  DateTime? // horario que o cliente escolheu no site (disponibilidade real, sujeito a confirmacao)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
