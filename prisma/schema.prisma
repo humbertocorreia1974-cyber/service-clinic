@@ -166,6 +166,7 @@ model ServiceOrder {
   finishedAt   DateTime?
   city         String
   address      String?
+  travelFee    Decimal?    @db.Decimal(10, 2) // taxa de deslocamento, informada no orcamento antes da confirmacao
   totalValue   Decimal?    @db.Decimal(10, 2)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
@@ -272,7 +273,8 @@ model Visit {
   assignedToId String?
   assignedTo   User?       @relation("VisitTechnician", fields: [assignedToId], references: [id])
   scheduledAt  DateTime
-  durationMin  Int         @default(60)
+  durationMin  Int         @default(40) // media real de atendimento (Humberto, 30/09): ~40min, varia por complexidade
+  travelFee    Decimal?    @db.Decimal(10, 2) // taxa de deslocamento, varia por cidade/distancia — nao existe "plano" fixo
   city         String
   address      String?
   status       String      @default("agendada") // agendada | confirmada | realizada | cancelada | remarcada
