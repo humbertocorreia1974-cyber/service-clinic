@@ -12,6 +12,10 @@
 // Wind/Package em content/landing.ts) emparelhados com fotos correspondentes em vez
 // de ícone-em-caixinha. O gap estrutural (skeleton sem suporte a foto) fica registrado
 // como pendência separada — ver task de correção do template golden do builder.
+//
+// 🩹 2026-09-30 (2ª rodada, mesmo dia): logo do header pequena demais, footer era
+// só uma linha de copyright sem link nenhum pra /contato, /privacidade, /termos,
+// /servicos, /area-atendida — páginas que EXISTEM no projeto mas ninguém encontrava.
 import Link from "next/link";
 import * as Icons from "lucide-react";
 import { ArrowRight, Check } from "lucide-react";
@@ -26,6 +30,20 @@ function Icon({ name, className }: { name?: string; className?: string }) {
   const C = (Icons as Record<string, any>)[name || "Sparkles"] ?? Icons.Sparkles;
   return <C className={className} />;
 }
+
+const FOOTER_LINKS = [
+  { label: "Serviços", href: "/servicos" },
+  { label: "Área atendida", href: "/area-atendida" },
+  { label: "Catálogo de peças", href: "/pecas" },
+  { label: "Sobre", href: "/sobre" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contato", href: "/contato" },
+];
+
+const FOOTER_LEGAL = [
+  { label: "Política de Privacidade", href: "/privacidade" },
+  { label: "Termos de Uso", href: "/termos" },
+];
 
 export default function Home() {
   const l: any = {
@@ -52,8 +70,8 @@ export default function Home() {
   return (
     <div className="relative">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <span className="flex items-center gap-2 text-base font-semibold tracking-tight">
-          <img src="/logo.svg" alt={l.name} className="h-7 w-7 rounded" />
+        <span className="flex items-center gap-3 text-lg font-semibold tracking-tight">
+          <img src="/logo.svg" alt={l.name} className="h-10 w-10 rounded-lg" />
           {l.name}
         </span>
         <nav className="flex items-center gap-1">
@@ -218,8 +236,52 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-border py-8 text-center text-sm text-fg-muted">
-        {l.name} · Construído com Service Clinic.
+      {/* FOOTER — navegação real (antes era só copyright): serviços, páginas legais,
+          WhatsApp e áreas atendidas, pra quem quiser achar sem rolar a home inteira */}
+      <footer className="border-t border-border">
+        <div className="mx-auto max-w-6xl px-6 py-12">
+          <div className="grid gap-10 sm:grid-cols-3">
+            <div>
+              <span className="flex items-center gap-2 text-base font-semibold tracking-tight text-fg">
+                <img src="/logo.svg" alt={l.name} className="h-8 w-8 rounded-lg" />
+                {l.name}
+              </span>
+              <p className="mt-3 max-w-xs text-sm leading-relaxed text-fg-muted">
+                Manutenção especializada para consultórios odontológicos, clínicas e hospitais no Sul Fluminense.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">Empresa</h4>
+              <ul className="mt-3 space-y-2">
+                {FOOTER_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm text-fg-muted transition-colors hover:text-fg">{link.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">Contato</h4>
+              <ul className="mt-3 space-y-2 text-sm text-fg-muted">
+                <li>
+                  <a href="https://wa.me/5524999467392" className="transition-colors hover:text-fg">WhatsApp (24) 99946-7392</a>
+                </li>
+                <li>Volta Redonda · Pinheiral · Barra Mansa · Resende · Barra do Piraí</li>
+              </ul>
+              <h4 className="mt-6 text-xs font-semibold uppercase tracking-wide text-fg-muted">Legal</h4>
+              <ul className="mt-3 space-y-2">
+                {FOOTER_LEGAL.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm text-fg-muted transition-colors hover:text-fg">{link.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="mt-10 border-t border-border pt-6 text-center text-sm text-fg-muted">
+            {l.name} · Construído com JGNEXT.
+          </div>
+        </div>
       </footer>
     </div>
   );
