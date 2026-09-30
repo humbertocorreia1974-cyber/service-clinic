@@ -2,6 +2,16 @@
 // quando o pedido é uma landing. O DeveloperAgent NÃO reescreve este arquivo:
 // ele só reescreve `content/landing.ts` com o conteúdo real. Assim toda landing
 // gerada sai com o MESMO layout premium, só o texto muda.
+//
+// 🩹 2026-09-30 (achado real, feedback direto do Humberto vendo o site publicado):
+// esta cópia (só desta sessão, não o skeleton mestre) foi reescrita à mão porque
+// o skeleton genérico não tem NENHUM slot de foto — vira sempre grid de ícone+texto,
+// mesmo layout pra qualquer negócio. Pra um cliente B2B técnico de verdade isso lê
+// como "SaaS genérico feito por IA", não como uma empresa real se profissionalizando.
+// Composição aqui: hero com foto real do consultório, e os 3 pilares reais (Wrench/
+// Wind/Package em content/landing.ts) emparelhados com fotos correspondentes em vez
+// de ícone-em-caixinha. O gap estrutural (skeleton sem suporte a foto) fica registrado
+// como pendência separada — ver task de correção do template golden do builder.
 import Link from "next/link";
 import * as Icons from "lucide-react";
 import { ArrowRight, Check } from "lucide-react";
@@ -9,10 +19,6 @@ import { Button } from "@/components/ui/button";
 import { landing } from "@/content/landing";
 import ContactForm from "./contact-form";
 
-// O DeveloperAgent reescreve `content/landing.ts` e às vezes muda a forma dos
-// objetos (ex: pricing sem `cta`, sem `period`). O skeleton é DEFENSIVO: lê tudo
-// como `any` e tem fallback pra todo campo. Assim a landing nunca quebra nem
-// mostra botão vazio.
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const L: any = landing || {};
 
@@ -32,65 +38,111 @@ export default function Home() {
     faq: Array.isArray(L.faq) ? L.faq : [],
     cta: L.cta || {},
   };
+
+  // os 3 pilares reais do negócio (primeiros 3 itens de features) ganham foto;
+  // os secundários (laudos, agenda, cobertura) ficam como faixa compacta abaixo.
+  const pillars = l.features.slice(0, 3);
+  const secondary = l.features.slice(3);
+  const pillarPhotos = ["/photos/dental-tools.jpg", "/photos/ac-tech.jpg", "/photos/tools-tray.jpg"];
+  const pillarAlt = [
+    "Instrumental odontológico em manutenção",
+    "Técnico realizando higienização de ar-condicionado",
+    "Peças e instrumentos organizados para reposição",
+  ];
+
   return (
     <div className="relative">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px] bg-[radial-gradient(60%_60%_at_50%_0%,hsl(var(--brand)/0.16),transparent_70%)]"
-      />
-
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <span className="flex items-center gap-2 text-base font-semibold tracking-tight">
           <img src="/logo.svg" alt={l.name} className="h-7 w-7 rounded" />
           {l.name}
         </span>
         <nav className="flex items-center gap-1">
-          <Link href="#features"><Button variant="ghost" size="sm">Recursos</Button></Link>
+          <Link href="#pilares"><Button variant="ghost" size="sm">Serviços</Button></Link>
           {l.pricing?.length ? <Link href="#pricing"><Button variant="ghost" size="sm">Preços</Button></Link> : null}
           <Link href={l.hero.ctaHref ?? "#contato"}><Button size="sm">{l.hero.cta || "Começar"}</Button></Link>
         </nav>
       </header>
 
-      {/* HERO */}
-      <section className="animate-fade-up mx-auto max-w-3xl px-6 pt-16 pb-20 text-center sm:pt-24 sm:pb-28">
-        {l.hero.badge ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs text-fg-muted backdrop-blur-sm">
-            <Icons.Sparkles className="h-3 w-3 text-brand" />
-            {l.hero.badge}
-          </span>
-        ) : null}
-        <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl md:text-6xl">
-          {l.hero.headline || l.hero.title || `${l.name}`}
-        </h1>
-        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-fg-muted">{l.hero.sub || l.hero.subtitle || l.hero.subheadline || l.hero.description}</p>
-        <div className="mt-10 flex flex-wrap justify-center gap-3">
-          <Link href={l.hero.ctaHref ?? "#contato"}>
-            <Button size="lg" className="gap-2">{l.hero.cta || l.hero.ctaText || "Começar grátis"}<ArrowRight className="h-4 w-4" /></Button>
-          </Link>
-          {l.hero.ctaSecondary ? (
-            <Link href={l.hero.ctaSecondaryHref ?? "#features"}>
-              <Button variant="secondary" size="lg">{l.hero.ctaSecondary}</Button>
-            </Link>
+      {/* HERO — foto real do consultório, não gradiente genérico */}
+      <section className="mx-auto grid max-w-6xl gap-10 px-6 pb-20 pt-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-14">
+        <div>
+          {l.hero.badge ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs text-fg-muted backdrop-blur-sm">
+              <Icons.BadgeCheck className="h-3.5 w-3.5 text-brand" />
+              {l.hero.badge}
+            </span>
           ) : null}
+          <h1 className="mt-6 max-w-xl text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
+            {l.hero.headline || l.hero.title || `${l.name}`}
+          </h1>
+          <p className="mt-6 max-w-lg text-lg leading-relaxed text-fg-muted">{l.hero.sub || l.hero.subtitle || l.hero.subheadline || l.hero.description}</p>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link href={l.hero.ctaHref ?? "#contato"}>
+              <Button size="lg" className="gap-2">{l.hero.cta || l.hero.ctaText || "Começar grátis"}<ArrowRight className="h-4 w-4" /></Button>
+            </Link>
+            {l.hero.ctaSecondary ? (
+              <Link href={l.hero.ctaSecondaryHref ?? "#pilares"}>
+                <Button variant="secondary" size="lg">{l.hero.ctaSecondary}</Button>
+              </Link>
+            ) : null}
+          </div>
+        </div>
+        <div className="relative">
+          <div className="absolute -inset-3 -z-10 rounded-3xl bg-brand/10 blur-2xl" aria-hidden />
+          <img
+            src="/photos/dental-chair.jpg"
+            alt="Consultório odontológico equipado, atendido pela Service Clinic"
+            className="h-[420px] w-full rounded-2xl border border-border object-cover shadow-2xl"
+          />
+          <div className="absolute -bottom-6 left-6 right-6 rounded-xl border border-border bg-surface/95 px-5 py-4 shadow-xl backdrop-blur">
+            <div className="flex items-center gap-2 text-sm font-semibold text-fg">
+              <Icons.MapPin className="h-4 w-4 text-brand" />
+              Volta Redonda · Pinheiral · Barra Mansa · Resende · Barra do Piraí
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section id="features" className="mx-auto max-w-6xl px-6 pb-24">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {l.features.map((f: any, fi: number) => (
+      {/* PILARES — cada serviço real com a foto correspondente, blocos alternados */}
+      <section id="pilares" className="mx-auto max-w-6xl px-6 pb-24 pt-8">
+        <div className="flex flex-col gap-16">
+          {pillars.map((f: any, fi: number) => (
             <div
               key={f.title || fi}
-              className="group rounded-lg border border-border bg-surface/70 p-6 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-brand/40 hover:bg-surface"
+              className={`grid items-center gap-8 lg:grid-cols-2 lg:gap-14 ${fi % 2 === 1 ? "lg:[&>*:first-child]:order-2" : ""}`}
             >
-              <div className="inline-flex rounded-lg border border-border bg-bg p-2.5 transition-colors group-hover:border-brand/40">
-                <Icon name={f.icon} className="h-5 w-5 text-brand" />
+              <img
+                src={pillarPhotos[fi] || pillarPhotos[0]}
+                alt={pillarAlt[fi] || f.title}
+                className="h-72 w-full rounded-2xl border border-border object-cover shadow-lg lg:h-80"
+              />
+              <div>
+                <div className="inline-flex rounded-lg border border-border bg-bg p-2.5">
+                  <Icon name={f.icon} className="h-5 w-5 text-brand" />
+                </div>
+                <h3 className="mt-4 text-2xl font-semibold tracking-tight text-fg">{f.title || f.name}</h3>
+                <p className="mt-3 max-w-md text-base leading-relaxed text-fg-muted">{f.body || f.description || f.text}</p>
               </div>
-              <h3 className="mt-4 text-base font-semibold text-fg">{f.title || f.name}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-fg-muted">{f.body || f.description || f.text}</p>
             </div>
           ))}
         </div>
+
+        {secondary.length ? (
+          <div className="mt-16 grid gap-4 border-t border-border pt-12 sm:grid-cols-3">
+            {secondary.map((f: any, fi: number) => (
+              <div key={f.title || fi} className="flex gap-3">
+                <div className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-bg">
+                  <Icon name={f.icon} className="h-4 w-4 text-brand" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-fg">{f.title || f.name}</h4>
+                  <p className="mt-1 text-sm leading-relaxed text-fg-muted">{f.body || f.description || f.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </section>
 
       {/* STEPS */}
@@ -113,30 +165,30 @@ export default function Home() {
         <section id="pricing" className="mx-auto max-w-5xl px-6 pb-24">
           <h2 className="text-center text-2xl font-semibold tracking-tight">Planos</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            {l.pricing.map((p: any, pi: number) => {
-              const highlight = p.highlight ?? pi === 1; // 2º plano em destaque por padrão
+            {l.pricing.map((pr: any, pi: number) => {
+              const highlight = pr.highlight ?? pi === 1;
               return (
                 <div
-                  key={p.name || pi}
+                  key={pr.name || pi}
                   className={`rounded-lg border p-6 ${highlight ? "border-brand bg-surface" : "border-border bg-surface/60"}`}
                 >
-                  <h3 className="text-sm font-semibold text-fg">{p.name || `Plano ${pi + 1}`}</h3>
+                  <h3 className="text-sm font-semibold text-fg">{pr.name || `Plano ${pi + 1}`}</h3>
                   <div className="mt-3 flex items-baseline gap-1">
-                    <span className="text-3xl font-semibold text-fg">{p.price ?? ""}</span>
-                    {p.period ? <span className="text-sm text-fg-muted">{p.period}</span> : null}
+                    <span className="text-3xl font-semibold text-fg">{pr.price ?? ""}</span>
+                    {pr.period ? <span className="text-sm text-fg-muted">{pr.period}</span> : null}
                   </div>
-                  {p.description ? <p className="mt-2 text-sm text-fg-muted">{p.description}</p> : null}
+                  {pr.description ? <p className="mt-2 text-sm text-fg-muted">{pr.description}</p> : null}
                   <ul className="mt-5 space-y-2">
-                    {(Array.isArray(p.features) ? p.features : []).map((feat: string, fi: number) => (
+                    {(Array.isArray(pr.features) ? pr.features : []).map((feat: string, fi: number) => (
                       <li key={fi} className="flex items-start gap-2 text-sm text-fg-muted">
                         <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                         {feat}
                       </li>
                     ))}
                   </ul>
-                  <Link href={p.href ?? "#contato"} className="mt-6 block">
+                  <Link href={pr.href ?? "#contato"} className="mt-6 block">
                     <Button variant={highlight ? "primary" : "secondary"} className="w-full">
-                      {p.cta || p.button || `Escolher ${p.name || "plano"}`}
+                      {pr.cta || pr.button || `Escolher ${pr.name || "plano"}`}
                     </Button>
                   </Link>
                 </div>
