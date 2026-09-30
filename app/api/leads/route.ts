@@ -26,6 +26,11 @@ export async function POST(request: Request) {
     const source = VALID_SOURCES.includes(body?.source)
       ? String(body.source)
       : "site_home";
+    let preferredAt: Date | null = null;
+    if (body?.preferredAt) {
+      const parsed = new Date(String(body.preferredAt));
+      if (!Number.isNaN(parsed.getTime())) preferredAt = parsed;
+    }
 
     if (!name || !phone || !city) {
       return NextResponse.json(
@@ -50,6 +55,7 @@ export async function POST(request: Request) {
         message,
         source,
         status: "novo",
+        preferredAt,
       },
     });
 
