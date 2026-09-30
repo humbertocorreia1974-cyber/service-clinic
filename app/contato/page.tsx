@@ -74,12 +74,9 @@ export default async function ContatoPage({
               <ul className="mt-3 space-y-3 text-sm text-fg-muted">
                 <li>
                   <span className="block text-fg">WhatsApp</span>
-                  Confirmação e agendamento rápido pelo canal oficial.
-                </li>
-                <li>
-                  <span className="block text-fg">E-mail</span>
-                  Envie fotos do equipamento e nota fiscal pra orçamento mais
-                  assertivo.
+                  <a href="https://wa.me/5524999467392" className="text-brand hover:text-accent transition-colors duration-150">
+                    (24) 99946-7392
+                  </a>
                 </li>
                 <li>
                   <span className="block text-fg">Horário</span>
