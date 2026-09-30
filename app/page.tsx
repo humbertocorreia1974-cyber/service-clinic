@@ -16,6 +16,12 @@
 // 🩹 2026-09-30 (2ª rodada, mesmo dia): logo do header pequena demais, footer era
 // só uma linha de copyright sem link nenhum pra /contato, /privacidade, /termos,
 // /servicos, /area-atendida — páginas que EXISTEM no projeto mas ninguém encontrava.
+//
+// 🩹 2026-09-30 (3ª rodada, mesmo dia): abaixo dos 2 pilares com foto, o resto da
+// rolagem era um "muro preto" — cartões idênticos, mesmo fundo, do sub-serviço até
+// o FAQ. Usei a 4ª foto licenciada (ac-tech.jpg, nunca usada) no item de PMOC e
+// criei bandas de fundo alternadas (steps e depoimentos) pra dar ritmo visual sem
+// inventar foto nenhuma onde não existe uma real.
 import Link from "next/link";
 import * as Icons from "lucide-react";
 import { ArrowRight, Check } from "lucide-react";
@@ -146,46 +152,60 @@ export default function Home() {
         </div>
 
         {secondary.length ? (
-          <div className="mt-16 grid gap-4 border-t border-border pt-12 sm:grid-cols-3">
-            {secondary.map((f: any, fi: number) => (
-              <div key={f.title || fi} className="flex gap-3">
-                <div className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-bg">
-                  <Icon name={f.icon} className="h-4 w-4 text-brand" />
+          <div className="mt-16 grid gap-6 border-t border-border pt-12 lg:grid-cols-3">
+            {secondary.map((f: any, fi: number) =>
+              fi === 0 ? (
+                <div key={f.title || fi} className="overflow-hidden rounded-2xl border border-border bg-surface/60">
+                  <img
+                    src="/photos/ac-tech.jpg"
+                    alt="Técnico realizando higienização de ar-condicionado em ambiente clínico"
+                    className="h-36 w-full object-cover"
+                  />
+                  <div className="p-5">
+                    <h4 className="text-sm font-semibold text-fg">{f.title || f.name}</h4>
+                    <p className="mt-1 text-sm leading-relaxed text-fg-muted">{f.body || f.description || f.text}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-sm font-semibold text-fg">{f.title || f.name}</h4>
+              ) : (
+                <div key={f.title || fi} className="rounded-2xl border border-border bg-surface/40 p-5">
+                  <div className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10">
+                    <Icon name={f.icon} className="h-4 w-4 text-accent" />
+                  </div>
+                  <h4 className="mt-3 text-sm font-semibold text-fg">{f.title || f.name}</h4>
                   <p className="mt-1 text-sm leading-relaxed text-fg-muted">{f.body || f.description || f.text}</p>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         ) : null}
       </section>
 
-      {/* STEPS */}
+      {/* STEPS — banda de fundo clara pra quebrar o preto contínuo */}
       {l.steps?.length ? (
-        <section className="mx-auto max-w-4xl px-6 pb-24">
-          <div className="grid gap-8 sm:grid-cols-3">
-            {l.steps.map((s: any, i: number) => (
-              <div key={s.title || i}>
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-semibold text-white">{i + 1}</div>
-                <h3 className="mt-4 text-sm font-semibold text-fg">{s.title || s.name}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-fg-muted">{s.body || s.description || s.text}</p>
-              </div>
-            ))}
+        <section className="border-y border-border bg-surface/30">
+          <div className="mx-auto max-w-4xl px-6 py-24">
+            <div className="grid gap-8 sm:grid-cols-3">
+              {l.steps.map((s: any, i: number) => (
+                <div key={s.title || i}>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-semibold text-white">{i + 1}</div>
+                  <h3 className="mt-4 text-sm font-semibold text-fg">{s.title || s.name}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-fg-muted">{s.body || s.description || s.text}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       ) : null}
 
       {/* AGENDA — marcação automática, taxa de deslocamento, tempo médio (não é "planos") */}
       {l.agenda?.length ? (
-        <section id="agenda" className="mx-auto max-w-5xl px-6 pb-24">
+        <section id="agenda" className="mx-auto max-w-5xl px-6 py-24">
           <h2 className="text-center text-2xl font-semibold tracking-tight">Como funciona o atendimento</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {l.agenda.map((a: any, ai: number) => (
               <div key={a.title || ai} className="rounded-lg border border-border bg-surface/60 p-6">
-                <div className="inline-flex rounded-lg border border-border bg-bg p-2.5">
-                  <Icons.CalendarClock className="h-5 w-5 text-brand" />
+                <div className="inline-flex rounded-lg bg-accent/10 p-2.5">
+                  <Icons.CalendarClock className="h-5 w-5 text-accent" />
                 </div>
                 <h3 className="mt-4 text-sm font-semibold text-fg">{a.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-fg-muted">{a.body}</p>
@@ -195,19 +215,22 @@ export default function Home() {
         </section>
       ) : null}
 
-      {/* TESTIMONIALS */}
+      {/* TESTIMONIALS — banda com leve tom da marca (petróleo), pra não repetir o
+          mesmo fundo de AGENDA logo acima */}
       {l.testimonials?.length ? (
-        <section className="mx-auto max-w-4xl px-6 pb-24">
-          <div className="grid gap-4 sm:grid-cols-2">
-            {l.testimonials.map((t: any, ti: number) => (
-              <figure key={t.name || ti} className="rounded-lg border border-border bg-surface/60 p-6">
-                <blockquote className="text-sm leading-relaxed text-fg">&ldquo;{t.quote || t.text || t.body}&rdquo;</blockquote>
-                <figcaption className="mt-4 text-xs text-fg-muted">
-                  <span className="font-medium text-fg">{t.name || t.author}</span>
-                  {t.role || t.title ? ` · ${t.role || t.title}` : ""}
-                </figcaption>
-              </figure>
-            ))}
+        <section className="border-y border-border bg-brand/5">
+          <div className="mx-auto max-w-4xl px-6 py-24">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {l.testimonials.map((t: any, ti: number) => (
+                <figure key={t.name || ti} className="rounded-lg border border-border bg-surface/60 p-6">
+                  <blockquote className="text-sm leading-relaxed text-fg">&ldquo;{t.quote || t.text || t.body}&rdquo;</blockquote>
+                  <figcaption className="mt-4 text-xs text-fg-muted">
+                    <span className="font-medium text-fg">{t.name || t.author}</span>
+                    {t.role || t.title ? ` · ${t.role || t.title}` : ""}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
           </div>
         </section>
       ) : null}
