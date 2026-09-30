@@ -97,6 +97,7 @@ model Client {
   patients        Patient[]
   appointments    Appointment[]
   consents        Consent[]
+  reviews         Review[]
 
   @@index([insurancePlanId])
 }
@@ -166,8 +167,11 @@ model ServiceOrder {
   finishedAt   DateTime?
   city         String
   address      String?
-  travelFee    Decimal?    @db.Decimal(10, 2) // taxa de deslocamento, informada no orcamento antes da confirmacao
-  totalValue   Decimal?    @db.Decimal(10, 2)
+  travelFee       Decimal?    @db.Decimal(10, 2) // taxa de deslocamento, informada no orcamento antes da confirmacao
+  totalValue      Decimal?    @db.Decimal(10, 2)
+  clientApprovedAt DateTime?  // cliente aprovou o orcamento/execucao pelo portal
+  materialsPlanned String?    // material previsto, preenchido pelo tecnico antes da execucao
+  materialsUsed    String?    // material realmente usado, preenchido pelo tecnico ao concluir
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
@@ -179,12 +183,26 @@ model ServiceOrder {
   invoiceItems   InvoiceItem[]
   medicalRecords MedicalRecord[]
   documents      Document[]
+  review         Review?
 
   @@index([clientId])
   @@index([equipmentId])
   @@index([technicianId])
   @@index([createdById])
   @@index([assignedToId])
+}
+
+model Review {
+  id             String       @id @default(cuid())
+  serviceOrderId String       @unique
+  serviceOrder   ServiceOrder @relation(fields: [serviceOrderId], references: [id], onDelete: Cascade)
+  clientId       String
+  client         Client       @relation(fields: [clientId], references: [id])
+  rating         Int // 1 a 5
+  comment        String?
+  createdAt      DateTime     @default(now())
+
+  @@index([clientId])
 }
 
 model ServiceOrderChecklist {
@@ -277,7 +295,7 @@ model Visit {
   travelFee    Decimal?    @db.Decimal(10, 2) // taxa de deslocamento, varia por cidade/distancia — nao existe "plano" fixo
   city         String
   address      String?
-  status       String      @default("agendada") // agendada | confirmada | realizada | cancelada | remarcada
+  status       String      @default("agendada") // agendada | confirmada | a_caminho | realizada | cancelada | remarcada
   confirmedAt  DateTime?
   confirmedVia String? // whatsapp | email | telefone
   notes        String?
@@ -392,7 +410,7 @@ model StockMovement {
 }
 
 model Lead {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   name         String
   email        String?
   phone        String
@@ -402,14 +420,14 @@ model Lead {
   message      String?
   partId       String?
   clientId     String?
-  client       Client?  @relation(fields: [clientId], references: [id])
+  client       Client?   @relation(fields: [clientId], references: [id])
   assignedToId String?
-  assignedTo   User?    @relation("LeadAssignedTo", fields: [assignedToId], references: [id])
-  status       String   @default("novo") // novo | contatado | qualificado | convertido | perdido
+  assignedTo   User?     @relation("LeadAssignedTo", fields: [assignedToId], references: [id])
+  status       String    @default("novo") // novo | contatado | qualificado | convertido | perdido
   notes        String?
   preferredAt  DateTime? // horario que o cliente escolheu no site (disponibilidade real, sujeito a confirmacao)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([clientId])
   @@index([assignedToId])
