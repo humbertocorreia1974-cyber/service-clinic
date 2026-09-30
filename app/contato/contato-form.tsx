@@ -1,10 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 type Cidade = { id: string; name: string; state: string };
+type DisponibilidadeDia = { date: string; slots: string[] };
+
+function formatDiaLabel(iso: string) {
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+}
 
 export function ContatoForm({
   cidades,
@@ -15,6 +21,34 @@ export function ContatoForm({
 }) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle');
   const [erro, setErro] = useState<string | null>(null);
+  const [cidadeSelecionada, setCidadeSelecionada] = useState(cidadePreferida || '');
+  const [dias, setDias] = useState<DisponibilidadeDia[] | null>(null);
+  const [carregandoAgenda, setCarregandoAgenda] = useState(false);
+  const [slotEscolhido, setSlotEscolhido] = useState<{ date: string; hora: string } | null>(null);
+
+  useEffect(() => {
+    setSlotEscolhido(null);
+    if (!cidadeSelecionada || cidadeSelecionada === 'Outra') {
+      setDias(null);
+      return;
+    }
+    let cancelado = false;
+    setCarregandoAgenda(true);
+    fetch(`/api/public/availability?city=${encodeURIComponent(cidadeSelecionada)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelado) setDias(Array.isArray(data?.days) ? data.days : []);
+      })
+      .catch(() => {
+        if (!cancelado) setDias([]);
+      })
+      .finally(() => {
+        if (!cancelado) setCarregandoAgenda(false);
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, [cidadeSelecionada]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -22,6 +56,9 @@ export function ContatoForm({
     setErro(null);
 
     const fd = new FormData(e.currentTarget);
+    const preferredAt =
+      slotEscolhido != null ? `${slotEscolhido.date}T${slotEscolhido.hora}:00` : null;
+
     const payload = {
       name: String(fd.get('name') ?? '').trim(),
       email: String(fd.get('email') ?? '').trim() || null,
@@ -30,6 +67,7 @@ export function ContatoForm({
       subject: String(fd.get('subject') ?? '').trim() || null,
       message: String(fd.get('message') ?? '').trim() || null,
       source: 'contato',
+      preferredAt,
     };
 
     if (!payload.name || !payload.phone || !payload.city) {
@@ -50,6 +88,7 @@ export function ContatoForm({
       }
       setStatus('ok');
       (e.target as HTMLFormElement).reset();
+      setSlotEscolhido(null);
     } catch (err) {
       setStatus('error');
       setErro(err instanceof Error ? err.message : 'Erro inesperado');
@@ -63,8 +102,9 @@ export function ContatoForm({
           Recebemos seu pedido.
         </p>
         <p className="mt-2 text-sm text-fg-muted">
-          Nossa equipe entra em contato em até 1 dia útil. Se for urgência,
-          chame no WhatsApp.
+          {slotEscolhido
+            ? 'Nossa equipe confirma o horário escolhido em até 1 dia útil. Se for urgência, chame no WhatsApp.'
+            : 'Nossa equipe entra em contato em até 1 dia útil. Se for urgência, chame no WhatsApp.'}
         </p>
         <button
           type="button"
@@ -120,7 +160,8 @@ export function ContatoForm({
             id="city"
             name="city"
             required
-            defaultValue={cidadePreferida}
+            value={cidadeSelecionada}
+            onChange={(e) => setCidadeSelecionada(e.target.value)}
             className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg outline-none transition-colors duration-150 focus-visible:border-brand"
           >
             <option value="">Selecione…</option>
@@ -152,6 +193,63 @@ export function ContatoForm({
           <option value="Outro">Outro</option>
         </select>
       </div>
+
+      {/* Disponibilidade real — cruza técnicos cadastrados com visitas/OS já
+          agendadas. Só aparece quando há dado real pra mostrar; sem isso, o
+          cliente segue descrevendo o pedido no campo de texto abaixo, como
+          sempre, e nossa equipe confirma o horário manualmente. */}
+      {cidadeSelecionada && cidadeSelecionada !== 'Outra' ? (
+        <div>
+          <p className="mb-1 block text-sm text-fg-muted">
+            Prefere algum horário? (opcional)
+          </p>
+          {carregandoAgenda ? (
+            <p className="text-sm text-fg-muted">Consultando agenda…</p>
+          ) : dias && dias.length ? (
+            <div className="space-y-3 rounded-md border border-border bg-surface/60 p-4">
+              {dias.map((dia) => (
+                <div key={dia.date}>
+                  <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">
+                    {formatDiaLabel(dia.date)}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {dia.slots.map((hora) => {
+                      const ativo =
+                        slotEscolhido?.date === dia.date && slotEscolhido?.hora === hora;
+                      return (
+                        <button
+                          key={hora}
+                          type="button"
+                          onClick={() =>
+                            setSlotEscolhido(ativo ? null : { date: dia.date, hora })
+                          }
+                          className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors duration-150 ${
+                            ativo
+                              ? 'border-brand bg-brand text-white'
+                              : 'border-border bg-bg text-fg-muted hover:border-brand/40'
+                          }`}
+                        >
+                          {hora}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+              {slotEscolhido ? (
+                <p className="text-xs text-fg-muted">
+                  Horário escolhido: {formatDiaLabel(slotEscolhido.date)} às{' '}
+                  {slotEscolhido.hora}. Sujeito à confirmação da nossa equipe.
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <p className="text-sm text-fg-muted">
+              Sem horários pré-calculados agora — descreva abaixo e nossa equipe confirma o melhor dia com você.
+            </p>
+          )}
+        </div>
+      ) : null}
 
       <div>
         <label htmlFor="message" className="mb-1 block text-sm text-fg-muted">
