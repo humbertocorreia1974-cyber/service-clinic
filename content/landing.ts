@@ -3,14 +3,7 @@ export type LandingContent = {
   hero: { badge: string; headline: string; sub: string; cta: string };
   features: { icon: string; title: string; body: string }[];
   steps: { title: string; body: string }[];
-  pricing: {
-    name: string;
-    price: string;
-    period: string;
-    features: string[];
-    cta: string;
-    highlight?: boolean;
-  }[];
+  agenda: { title: string; body: string }[];
   testimonials: { quote: string; name: string; role: string }[];
   faq: { q: string; a: string }[];
 };
@@ -18,22 +11,17 @@ export type LandingContent = {
 export const landing: LandingContent = {
   name: "Service Clinic",
   hero: {
-    badge: "Manutenção odontológica + PMOC no Sul Fluminense",
+    badge: "Manutenção especializada para consultórios, clínicas e hospitais",
     headline:
-      "Manutenção odontológica e higienização de ar-condicionado com laudo PMOC no Sul Fluminense",
-    sub: "A Service Clinic cuida da preventiva e corretiva dos seus equipamentos odontológicos, da higienização técnica do ar-condicionado em ambiente clínico e ainda fornece peças de reposição — com ordens de serviço, laudos assinados e agenda por técnico em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
+      "Manutenção especializada para consultórios odontológicos, clínicas e hospitais no Sul Fluminense",
+    sub: "A Service Clinic cuida da preventiva e corretiva dos equipamentos do seu consultório, clínica ou hospital, com higienização técnica de ar-condicionado (laudo PMOC) como parte do pacote de manutenção clínica, além de peças de reposição. Agenda com marcação automática de horários e ordens de serviço digitais em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
     cta: "Solicitar orçamento agora",
   },
   features: [
     {
       icon: "Wrench",
-      title: "Preventiva e corretiva",
-      body: "Cadeiras, autoclaves, compressores, raio-X e fotopolimerizadores com checklist técnico e assinatura do responsável.",
-    },
-    {
-      icon: "Wind",
-      title: "Higienização com PMOC",
-      body: "Limpeza técnica de ar-condicionado em ambiente clínico com laudo assinado e validade documentada.",
+      title: "Manutenção de equipamentos",
+      body: "Cadeiras odontológicas, autoclaves, compressores, raio-X e fotopolimerizadores de consultórios, clínicas e hospitais — preventiva e corretiva com checklist técnico e assinatura do responsável. Inclui, como sub-serviço, a higienização técnica de ar-condicionado em ambiente clínico com laudo PMOC.",
     },
     {
       icon: "Package",
@@ -41,14 +29,14 @@ export const landing: LandingContent = {
       body: "Catálogo com SKU, compatibilidade por marca e entrega rápida para toda a região.",
     },
     {
+      icon: "Wind",
+      title: "Higienização com PMOC (sub-serviço)",
+      body: "Limpeza técnica de ar-condicionado em ambiente clínico, com laudo assinado — realizada junto com a manutenção dos equipamentos, nunca como serviço avulso de ar-condicionado comum.",
+    },
+    {
       icon: "FileCheck2",
       title: "Laudos e conformidade",
       body: "PMOC, biossegurança e laudo técnico assinado digitalmente — pronto para a vigilância sanitária.",
-    },
-    {
-      icon: "CalendarClock",
-      title: "Agenda por técnico",
-      body: "Visitas confirmadas por WhatsApp com histórico completo por clínica e por equipamento.",
     },
     {
       icon: "MapPin",
@@ -71,54 +59,27 @@ export const landing: LandingContent = {
     },
     {
       title: "Laudo e follow-up",
-      body: "Você recebe o laudo assinado e o alerta da próxima preventiva automaticamente.",
+      body: "Você recebe o laudo assinado e o alerta da próxima manutenção preventiva automaticamente.",
     },
   ],
-  pricing: [
+  agenda: [
     {
-      name: "Avulso",
-      price: "R$ 380",
-      period: "/visita",
-      features: [
-        "1 equipamento por visita",
-        "Checklist técnico completo",
-        "Relatório digital da OS",
-        "Garantia de 90 dias no serviço",
-      ],
-      cta: "Agendar visita",
+      title: "Marcação automática",
+      body: "Agenda com marcação automática de horários pelo site ou WhatsApp — sem ida e volta de mensagens pra fechar uma visita.",
     },
     {
-      name: "Preventiva Anual",
-      price: "R$ 1.290",
-      period: "/mês",
-      features: [
-        "Até 6 equipamentos cobertos",
-        "Visitas trimestrais programadas",
-        "Laudo PMOC do ar-condicionado incluso",
-        "Prioridade em chamados corretivos",
-        "Desconto de 15% em peças",
-      ],
-      cta: "Assinar preventiva",
-      highlight: true,
+      title: "Taxa de deslocamento",
+      body: "Cobrada conforme a cidade e a distância dentro da região atendida (Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí).",
     },
     {
-      name: "Clínica Completa",
-      price: "R$ 2.490",
-      period: "/mês",
-      features: [
-        "Equipamentos ilimitados da unidade",
-        "Visitas mensais + corretiva ilimitada",
-        "PMOC, biossegurança e laudos assinados",
-        "Portal do cliente com histórico completo",
-        "Gestor de conta dedicado",
-      ],
-      cta: "Falar com especialista",
+      title: "Tempo médio de atendimento",
+      body: "Cerca de 40 minutos por visita, podendo variar conforme a complexidade do equipamento ou serviço.",
     },
   ],
   testimonials: [
     {
       quote:
-        "Trocamos três fornecedores por um só. A preventiva trimestral acabou com as paradas de cadeira em plena agenda cheia.",
+        "Trocamos três fornecedores por um só. A manutenção preventiva acabou com as paradas de cadeira em plena agenda cheia.",
       name: "Dra. Camila Andrade",
       role: "Clínica OdontoVida — Volta Redonda",
     },
@@ -146,7 +107,7 @@ export const landing: LandingContent = {
     },
     {
       q: "Qual o prazo para atendimento corretivo?",
-      a: "Clientes com contrato de preventiva têm prioridade: até 24h úteis. Chamados avulsos entram na fila em até 72h.",
+      a: "Normalmente em até 24h úteis a partir da confirmação do agendamento, podendo variar conforme a demanda e a distância até a sua cidade.",
     },
     {
       q: "Vocês vendem peças separadamente?",
@@ -154,7 +115,11 @@ export const landing: LandingContent = {
     },
     {
       q: "Como funciona o pagamento?",
-      a: "Contratos mensais via boleto ou PIX. Serviços avulsos podem ser pagos por cartão, PIX ou transferência após a conclusão.",
+      a: "Pagamento por visita realizada, via PIX, cartão ou transferência após a conclusão do serviço. A taxa de deslocamento é informada no orçamento antes da confirmação.",
+    },
+    {
+      q: "Tem taxa de deslocamento?",
+      a: "Sim, varia conforme a cidade e a distância dentro da região atendida. O valor é informado no momento do agendamento, antes da confirmação da visita.",
     },
   ],
 };
