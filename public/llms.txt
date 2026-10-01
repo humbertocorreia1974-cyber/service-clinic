@@ -1,13 +1,13 @@
 # Service Clinic
 
-> Manutenção especializada de equipamentos odontológicos, higienização técnica de ar-condicionado em ambiente clínico (com laudo PMOC) e revenda de peças, atendendo consultórios odontológicos e clínicas no Sul Fluminense (RJ).
+> Manutenção especializada de equipamentos odontológicos e revenda de peças, atendendo consultórios odontológicos, clínicas e hospitais no Sul Fluminense (RJ).
 
 Service Clinic atende consultórios odontológicos e clínicas em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí (Sul Fluminense, RJ). Contato: WhatsApp (24) 99946-7392.
 
 ## Serviços
 
 - Manutenção preventiva e corretiva de equipamentos odontológicos (cadeiras, autoclaves, compressores, raio-X, fotopolimerizadores)
-- Higienização técnica de ar-condicionado em ambiente clínico, com laudo PMOC (biossegurança) — este serviço é específico para clínicas, não é ar-condicionado residencial/comercial genérico
+- Higienização técnica de ar-condicionado em ambiente clínico (sub-serviço) — específico para clínicas, não é ar-condicionado residencial/comercial genérico
 - Revenda de peças e acessórios para equipamentos odontológicos
 
 ## Páginas
