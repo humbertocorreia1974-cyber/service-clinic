@@ -25,12 +25,14 @@ export default async function DashboardPage() {
   if (role === "tecnico") redirect("/tecnico");
 
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+  const atalhos = role === "admin" ? [...ATALHOS_ADMIN, { href: "/usuarios", label: "Usuários" }] : ATALHOS_ADMIN;
+
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
       <h1 className="text-2xl font-semibold tracking-tight">Olá, {user?.name ?? user?.email}</h1>
       <p className="mt-1 text-sm text-fg-muted">Bem-vindo de volta ao Service Clinic.</p>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {ATALHOS_ADMIN.map((a) => (
+        {atalhos.map((a) => (
           <Link key={a.href} href={a.href}>
             <Card className="h-full transition-transform hover:-translate-y-1">
               <CardTitle className="text-base">{a.label}</CardTitle>
