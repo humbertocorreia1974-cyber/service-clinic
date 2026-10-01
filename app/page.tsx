@@ -82,13 +82,14 @@ export default function Home() {
     <div className="relative">
       <header className="sticky top-0 z-40 border-b border-border/60 bg-bg/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <span className="flex items-center gap-3 text-lg font-semibold tracking-tight">
-            <img src="/logo.svg" alt={l.name} className="h-10 w-10 rounded-lg" />
+          <span className="flex items-center gap-3 text-2xl font-bold tracking-tight">
+            <img src="/logo.svg" alt={l.name} className="h-16 w-16 rounded-xl shadow-lg shadow-brand/20" />
             {l.name}
           </span>
           <nav className="flex items-center gap-1">
             <Link href="#pilares"><Button variant="ghost" size="sm">Serviços</Button></Link>
             {l.agenda?.length ? <Link href="#agenda"><Button variant="ghost" size="sm">Agenda</Button></Link> : null}
+            <Link href="/login"><Button variant="ghost" size="sm">Entrar</Button></Link>
             <Link href={l.hero.ctaHref ?? "#contato"}><Button size="sm">{l.hero.cta || "Começar"}</Button></Link>
           </nav>
         </div>
@@ -202,13 +203,23 @@ export default function Home() {
         ) : null}
       </section>
 
-      {/* STEPS — banda surface-2 (contraste real) com numerais grandes e linha de
-          processo conectando os passos */}
+      {/* STEPS — foto real de fundo (consultório) com véu escuro, não é mais cor chapada */}
       {l.steps?.length ? (
-        <section className="border-y border-border bg-surface-2">
-          <div className="mx-auto max-w-5xl px-6 py-24">
+        <section className="relative overflow-hidden border-y border-border">
+          <img
+            src="/photos/dental-chair.jpg"
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(180deg, hsl(var(--bg) / 0.94), hsl(var(--bg) / 0.88) 40%, hsl(var(--surface-2) / 0.95))" }}
+            aria-hidden
+          />
+          <div className="relative mx-auto max-w-5xl px-6 py-24">
             <span className="text-xs font-semibold uppercase tracking-widest text-accent">Como funciona</span>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight">Do primeiro contato ao laudo final</h2>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight">Do primeiro contato ao registro final</h2>
             <div className="relative mt-14 grid gap-10 sm:grid-cols-4">
               <div className="absolute left-0 right-0 top-6 hidden h-px bg-gradient-to-r from-transparent via-border to-transparent sm:block" aria-hidden />
               {l.steps.map((s: any, i: number) => (
@@ -227,7 +238,14 @@ export default function Home() {
 
       {/* AGENDA — marcação automática, taxa de deslocamento, tempo médio (não é "planos") */}
       {l.agenda?.length ? (
-        <section id="agenda" className="mx-auto max-w-5xl px-6 py-24">
+        <section id="agenda" className="relative overflow-hidden">
+          <img
+            src="/photos/tools-tray.jpg"
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.07]"
+          />
+          <div className="relative mx-auto max-w-5xl px-6 py-24">
           <div className="text-center">
             <span className="text-xs font-semibold uppercase tracking-widest text-accent">Agenda</span>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight">Como funciona o atendimento</h2>
@@ -242,6 +260,7 @@ export default function Home() {
                 <p className="mt-2 text-sm leading-relaxed text-fg-muted">{a.body}</p>
               </div>
             ))}
+          </div>
           </div>
         </section>
       ) : null}
@@ -313,8 +332,8 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-6 py-12">
           <div className="grid gap-10 sm:grid-cols-3">
             <div>
-              <span className="flex items-center gap-2 text-base font-semibold tracking-tight text-fg">
-                <img src="/logo.svg" alt={l.name} className="h-8 w-8 rounded-lg" />
+              <span className="flex items-center gap-2 text-lg font-bold tracking-tight text-fg">
+                <img src="/logo.svg" alt={l.name} className="h-11 w-11 rounded-lg" />
                 {l.name}
               </span>
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-fg-muted">
