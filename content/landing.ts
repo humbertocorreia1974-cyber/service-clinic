@@ -14,14 +14,14 @@ export const landing: LandingContent = {
     badge: "Manutenção especializada para consultórios, clínicas e hospitais",
     headline:
       "Manutenção especializada para consultórios odontológicos, clínicas e hospitais no Sul Fluminense",
-    sub: "A Service Clinic cuida da preventiva e corretiva dos equipamentos do seu consultório, clínica ou hospital, com higienização técnica de ar-condicionado (laudo PMOC) como parte do pacote de manutenção clínica, além de peças de reposição. Agenda com marcação automática de horários e ordens de serviço digitais em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
+    sub: "A Service Clinic cuida da preventiva e corretiva dos equipamentos do seu consultório, clínica ou hospital, com peças de reposição e agenda com marcação automática de horários. Ordens de serviço digitais com checklist, fotos e assinatura em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
     cta: "Solicitar orçamento agora",
   },
   features: [
     {
       icon: "Wrench",
       title: "Manutenção de equipamentos",
-      body: "Cadeiras odontológicas, autoclaves, compressores, raio-X e fotopolimerizadores de consultórios, clínicas e hospitais — preventiva e corretiva com checklist técnico e assinatura do responsável. Inclui, como sub-serviço, a higienização técnica de ar-condicionado em ambiente clínico com laudo PMOC.",
+      body: "Cadeiras odontológicas, autoclaves, compressores, raio-X e fotopolimerizadores de consultórios, clínicas e hospitais — preventiva e corretiva com checklist técnico e assinatura do responsável.",
     },
     {
       icon: "Package",
@@ -30,13 +30,13 @@ export const landing: LandingContent = {
     },
     {
       icon: "Wind",
-      title: "Higienização com PMOC (sub-serviço)",
-      body: "Limpeza técnica de ar-condicionado em ambiente clínico, com laudo assinado — realizada junto com a manutenção dos equipamentos, nunca como serviço avulso de ar-condicionado comum.",
+      title: "Higienização de ar-condicionado (sub-serviço)",
+      body: "Limpeza técnica de ar-condicionado em ambiente clínico, registrada na ordem de serviço — realizada junto com a manutenção dos equipamentos, nunca como serviço avulso de ar-condicionado comum.",
     },
     {
       icon: "FileCheck2",
-      title: "Laudos e conformidade",
-      body: "PMOC, biossegurança e laudo técnico assinado digitalmente — pronto para a vigilância sanitária.",
+      title: "Registro técnico documentado",
+      body: "Checklist e registro técnico assinado digitalmente a cada visita, pra você manter seu próprio histórico organizado.",
     },
     {
       icon: "MapPin",
@@ -59,7 +59,7 @@ export const landing: LandingContent = {
     },
     {
       title: "Laudo e follow-up",
-      body: "Você recebe o laudo assinado e o alerta da próxima manutenção preventiva automaticamente.",
+      body: "Você recebe o registro técnico assinado e o alerta da próxima manutenção preventiva automaticamente.",
     },
   ],
   agenda: [
@@ -85,7 +85,7 @@ export const landing: LandingContent = {
     },
     {
       quote:
-        "O laudo PMOC assinado digitalmente resolveu nossa pendência na vigilância sanitária em uma semana.",
+        "A agenda automática e o checklist digital organizaram nossa manutenção preventiva — hoje sabemos exatamente quando cada equipamento foi revisado.",
       name: "Rafael Menezes",
       role: "Clínica Sorriso Real — Barra Mansa",
     },
@@ -100,10 +100,6 @@ export const landing: LandingContent = {
     {
       q: "Vocês atendem qual região?",
       a: "Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí. Visitas fora dessas cidades sob consulta.",
-    },
-    {
-      q: "O laudo PMOC tem validade legal?",
-      a: "Sim. Emitimos laudo técnico assinado digitalmente, com validade de 12 meses, conforme a Lei 13.589/2018 e a RE 09/2003 da Anvisa.",
     },
     {
       q: "Qual o prazo para atendimento corretivo?",
