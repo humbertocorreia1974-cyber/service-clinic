@@ -8,22 +8,22 @@ import { copy } from '@/content/copy';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Sobre a Service Clinic | Manutenção odontológica e PMOC no Sul Fluminense',
+  title: 'Sobre a Service Clinic | Manutenção odontológica no Sul Fluminense',
   description:
-    'Conheça a Service Clinic: equipe técnica especializada em manutenção de equipamentos odontológicos, higienização de ar-condicionado em ambiente clínico com laudo PMOC e revenda de peças no Sul Fluminense.',
+    'Conheça a Service Clinic: equipe técnica especializada em manutenção de equipamentos odontológicos e revenda de peças no Sul Fluminense.',
   openGraph: {
     title: 'Sobre a Service Clinic',
     description:
-      'Equipe técnica especializada em manutenção odontológica, higienização de AC clínico com laudo PMOC e revenda de peças no Sul Fluminense.',
+      'Equipe técnica especializada em manutenção odontológica e revenda de peças no Sul Fluminense.',
     type: 'website',
   },
 };
 
 const valores = [
   {
-    titulo: 'Biossegurança em primeiro lugar',
+    titulo: 'Registro técnico em primeiro lugar',
     corpo:
-      'Todo serviço em ambiente clínico segue protocolo de biossegurança, com laudo técnico assinado e rastreável.',
+      'Todo serviço em ambiente clínico é documentado, com registro técnico assinado e rastreável.',
   },
   {
     titulo: 'Técnico na sua cidade',
@@ -141,7 +141,7 @@ export default async function SobrePage() {
 
       <section className="mt-16 rounded-lg border border-border bg-surface/70 p-8 backdrop-blur-sm">
         <h2 className="font-display text-2xl font-bold text-fg">
-          Precisa de manutenção ou laudo PMOC?
+          Precisa de manutenção?
         </h2>
         <p className="mt-2 max-w-2xl text-fg-muted">
           Peça um orçamento sem compromisso. Respondemos em até 1 dia útil com
