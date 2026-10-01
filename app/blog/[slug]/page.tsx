@@ -22,7 +22,7 @@ export async function generateMetadata({
   const description =
     post.metaDescription ??
     post.excerpt ??
-    'Conteúdo técnico da Service Clinic sobre manutenção odontológica e PMOC.';
+    'Conteúdo técnico da Service Clinic sobre manutenção odontológica.';
   return {
     title,
     description,
