@@ -14,7 +14,7 @@ const SITE_URL = process.env.NEXTAUTH_URL?.replace(/\/$/, "") || "https://servic
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Service Clinic — Manutenção especializada para consultórios odontológicos",
-  description: "Manutenção preventiva e corretiva de equipamentos odontológicos, higienização de ar-condicionado com laudo PMOC e revenda de peças. Atendemos Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
+  description: "Manutenção preventiva e corretiva de equipamentos odontológicos e revenda de peças. Atendemos Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
   openGraph: {
     title: "Service Clinic",
     description: "Manutenção especializada para consultórios odontológicos no Sul Fluminense.",
@@ -36,7 +36,7 @@ const localBusinessJsonLd = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   name: "Service Clinic",
-  description: "Manutenção preventiva e corretiva de equipamentos odontológicos, higienização técnica de ar-condicionado em ambiente clínico com laudo PMOC e revenda de peças.",
+  description: "Manutenção preventiva e corretiva de equipamentos odontológicos e revenda de peças.",
   url: SITE_URL,
   telephone: "+5524999467392",
   image: `${SITE_URL}/og-image.png`,
