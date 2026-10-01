@@ -8,13 +8,13 @@ import { Wrench, Wind, Package, FileCheck2, CalendarClock, MapPin } from "lucide
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Serviços | Service Clinic — Manutenção odontológica e PMOC",
+  title: "Serviços | Service Clinic — Manutenção odontológica",
   description:
-    "Manutenção preventiva e corretiva de equipamentos odontológicos, higienização técnica de ar-condicionado com laudo PMOC e revenda de peças no Sul Fluminense.",
+    "Manutenção preventiva e corretiva de equipamentos odontológicos e revenda de peças no Sul Fluminense.",
   openGraph: {
     title: "Serviços | Service Clinic",
     description:
-      "Preventiva, corretiva, PMOC e peças de reposição para clínicas odontológicas no Sul Fluminense.",
+      "Preventiva, corretiva e peças de reposição para clínicas odontológicas no Sul Fluminense.",
     type: "website",
   },
 };
@@ -54,9 +54,9 @@ export default async function ServicosPage() {
     {
       id: "3",
       slug: "higienizacao-pmoc",
-      name: "Higienização de ar-condicionado com PMOC",
+      name: "Higienização de ar-condicionado (sub-serviço)",
       shortDescription:
-        "Limpeza técnica em ambiente clínico com laudo assinado digitalmente e validade de 12 meses.",
+        "Limpeza técnica em ambiente clínico, registrada na ordem de serviço — realizada junto com a manutenção dos equipamentos.",
       icon: "Wind",
     },
     {
@@ -109,10 +109,10 @@ export default async function ServicosPage() {
 
       <div className="mt-16 rounded-lg border border-border bg-surface/70 p-8 backdrop-blur-sm">
         <h2 className="font-display text-2xl font-bold text-fg">
-          Precisa de um laudo PMOC urgente?
+          Precisa de manutenção urgente?
         </h2>
         <p className="mt-2 text-fg-muted">
-          Emitimos laudo técnico assinado digitalmente em até 5 dias úteis após a vistoria.
+          Fale com a gente e receba diagnóstico inicial e prazo de atendimento.
         </p>
         <Link href="/contato" className="mt-6 inline-block">
           <Button variant="primary" size="lg">
