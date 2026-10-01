@@ -46,6 +46,10 @@ export default function LoginPage() {
           <p className="mt-3 max-w-sm text-brand-fg/75">
             Entre para continuar de onde parou.
           </p>
+          <p className="mt-6 max-w-sm text-sm text-brand-fg/60">
+            Um único login para equipe, técnicos e clínicas — cada um cai automaticamente
+            na própria área, sem acesso aos dados dos outros.
+          </p>
         </div>
         <p className="relative text-sm text-brand-fg/60">© {new Date().getFullYear()}</p>
       </div>
