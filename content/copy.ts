@@ -2,22 +2,22 @@
 // Importe isto nas páginas em vez de escrever copy nova - ver README do projeto.
 export const copy = {
   "marketing": {
-    "heroHeadline": "Manutenção odontológica e higienização de ar-condicionado com laudo PMOC no Sul Fluminense",
-    "heroSubheadline": "A Service Clinic cuida da preventiva e corretiva dos seus equipamentos odontológicos, da higienização técnica do ar-condicionado em ambiente clínico e ainda fornece peças de reposição — com ordens de serviço, laudos assinados e agenda por técnico em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
+    "heroHeadline": "Manutenção especializada para consultórios odontológicos no Sul Fluminense",
+    "heroSubheadline": "A Service Clinic cuida da preventiva e corretiva dos seus equipamentos odontológicos e ainda fornece peças de reposição — com ordens de serviço, registro técnico assinado e agenda por técnico em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
     "featureBullets": [
       "Ordens de serviço com checklist específico por tipo (preventiva, corretiva, higienização de AC, instalação e venda de peça), foto antes/depois e assinatura do cliente",
-      "Higienização de ar-condicionado seguindo roteiro de biossegurança, com geração de laudo PMOC assinado digitalmente para fiscalização",
+      "Higienização de ar-condicionado como sub-serviço, seguindo roteiro técnico, com registro assinado digitalmente para seu controle interno",
       "Contratos de preventiva com alerta automático de vencimento por WhatsApp e agenda de visitas por técnico e por cidade",
       "Portal do cliente com histórico de OS, laudos, próximas visitas e peças trocadas, além de catálogo público de peças com pedido de orçamento direto",
       "Painel com OS abertas, preventivas vencendo, clientes sem contrato e receita do mês, com controle de estoque e alerta de peças em nível mínimo"
     ],
-    "seoTitle": "Service Clinic | Manutenção Odontológica e PMOC no Sul Fluminense",
-    "seoDescription": "Manutenção preventiva e corretiva de equipamentos odontológicos, higienização de ar-condicionado com laudo PMOC e revenda de peças em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
-    "headline": "Manutenção odontológica e higienização de ar-condicionado com laudo PMOC no Sul Fluminense",
-    "subheadline": "A Service Clinic cuida da preventiva e corretiva dos seus equipamentos odontológicos, da higienização técnica do ar-condicionado em ambiente clínico e ainda fornece peças de reposição — com ordens de serviço, laudos assinados e agenda por técnico em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
+    "seoTitle": "Service Clinic | Manutenção Odontológica no Sul Fluminense",
+    "seoDescription": "Manutenção preventiva e corretiva de equipamentos odontológicos e revenda de peças em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
+    "headline": "Manutenção especializada para consultórios odontológicos no Sul Fluminense",
+    "subheadline": "A Service Clinic cuida da preventiva e corretiva dos seus equipamentos odontológicos e ainda fornece peças de reposição — com ordens de serviço, registro técnico assinado e agenda por técnico em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
     "bullets": [
       "Ordens de serviço com checklist específico por tipo (preventiva, corretiva, higienização de AC, instalação e venda de peça), foto antes/depois e assinatura do cliente",
-      "Higienização de ar-condicionado seguindo roteiro de biossegurança, com geração de laudo PMOC assinado digitalmente para fiscalização",
+      "Higienização de ar-condicionado como sub-serviço, seguindo roteiro técnico, com registro assinado digitalmente para seu controle interno",
       "Contratos de preventiva com alerta automático de vencimento por WhatsApp e agenda de visitas por técnico e por cidade",
       "Portal do cliente com histórico de OS, laudos, próximas visitas e peças trocadas, além de catálogo público de peças com pedido de orçamento direto",
       "Painel com OS abertas, preventivas vencendo, clientes sem contrato e receita do mês, com controle de estoque e alerta de peças em nível mínimo"
