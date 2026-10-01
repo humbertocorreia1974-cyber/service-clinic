@@ -51,7 +51,7 @@ const FOOTER_LEGAL = [
 ];
 
 const TRUST_CHIPS = [
-  { icon: "FileCheck2", label: "Laudo PMOC assinado digitalmente" },
+  { icon: "FileCheck2", label: "Registro técnico assinado a cada visita" },
   { icon: "ClipboardCheck", label: "Checklist técnico documentado" },
   { icon: "Receipt", label: "Taxa de deslocamento sem surpresa" },
 ];
