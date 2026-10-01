@@ -8,11 +8,11 @@ import { BookOpen, Calendar, MapPin } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Blog — Manutenção odontológica e PMOC no Sul Fluminense | Service Clinic',
+  title: 'Blog — Manutenção odontológica no Sul Fluminense | Service Clinic',
   description:
-    'Artigos técnicos sobre manutenção preventiva de equipamentos odontológicos, higienização de ar-condicionado em ambiente clínico, laudo PMOC e biossegurança no Sul Fluminense.',
+    'Artigos técnicos sobre manutenção preventiva de equipamentos odontológicos no Sul Fluminense.',
   openGraph: {
-    title: 'Blog Service Clinic — Manutenção odontológica e PMOC',
+    title: 'Blog Service Clinic — Manutenção odontológica',
     description:
       'Conteúdo técnico sobre manutenção de equipamentos odontológicos e higienização de ar-condicionado em clínicas.',
     type: 'website',
@@ -62,8 +62,8 @@ export default async function BlogPage({
           Conteúdo técnico para clínicas do Sul Fluminense
         </h1>
         <p className="mt-3 max-w-2xl text-fg-muted">
-          Guias sobre manutenção preventiva, biossegurança, PMOC e boas práticas para manter seus
-          equipamentos odontológicos em conformidade.
+          Guias sobre manutenção preventiva e boas práticas para manter seus
+          equipamentos odontológicos funcionando sem parar.
         </p>
       </header>
 
