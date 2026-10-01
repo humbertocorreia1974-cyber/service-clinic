@@ -101,7 +101,7 @@ export default async function AreaAtendidaPage() {
                   </p>
                   <ul className="mt-3 space-y-1 text-sm text-fg-muted">
                     <li>• Manutenção preventiva e corretiva</li>
-                    <li>• Higienização de AC clínico + PMOC</li>
+                    <li>• Higienização de AC clínico (sub-serviço)</li>
                     <li>• Entrega de peças de reposição</li>
                   </ul>
                   <Link
