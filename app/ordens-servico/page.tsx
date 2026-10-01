@@ -4,6 +4,7 @@ import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./[id]/status-badge";
 
 export const dynamic = "force-dynamic";
@@ -46,7 +47,14 @@ export default async function OrdensServicoListPage() {
       <Link href="/dashboard" className="text-sm text-fg-muted hover:text-brand transition-colors">
         ← Painel
       </Link>
-      <h1 className="mt-2 mb-6 font-display text-2xl font-bold text-fg">Ordens de Serviço</h1>
+      <div className="mt-2 mb-6 flex items-center justify-between">
+        <h1 className="font-display text-2xl font-bold text-fg">Ordens de Serviço</h1>
+        {["admin", "gerente"].includes(role) ? (
+          <Link href="/ordens-servico/novo">
+            <Button size="sm">+ Nova OS</Button>
+          </Link>
+        ) : null}
+      </div>
 
       {orders.length === 0 ? (
         <Card>
