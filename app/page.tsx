@@ -207,7 +207,7 @@ export default function Home() {
       {l.steps?.length ? (
         <section className="relative overflow-hidden border-y border-border">
           <img
-            src="/photos/dental-chair.jpg"
+            src="/photos/clinic-reception.png"
             alt=""
             aria-hidden
             className="absolute inset-0 h-full w-full object-cover"
@@ -240,10 +240,10 @@ export default function Home() {
       {l.agenda?.length ? (
         <section id="agenda" className="relative overflow-hidden">
           <img
-            src="/photos/tools-tray.jpg"
+            src="/photos/tool-cart-organized.png"
             alt=""
             aria-hidden
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.07]"
+            className="absolute inset-0 h-full w-full object-cover opacity-10"
           />
           <div className="relative mx-auto max-w-5xl px-6 py-24">
           <div className="text-center">
@@ -264,6 +264,23 @@ export default function Home() {
           </div>
         </section>
       ) : null}
+
+      {/* FAIXA DE FOTO — técnico em ação, quebra o ritmo entre agenda e depoimentos */}
+      <section className="relative h-64 overflow-hidden sm:h-80">
+        <img
+          src="/photos/technician-hands-tools.png"
+          alt="Técnico realizando manutenção de precisão em equipamento odontológico"
+          className="h-full w-full object-cover"
+        />
+        <div
+          className="absolute inset-0 flex items-end"
+          style={{ background: "linear-gradient(180deg, transparent 40%, hsl(var(--bg) / 0.9))" }}
+        >
+          <p className="px-6 pb-6 text-sm font-medium text-fg sm:px-10 sm:pb-8 sm:text-base">
+            Precisão técnica em cada visita, não serviço de ocasião.
+          </p>
+        </div>
+      </section>
 
       {/* TESTIMONIALS — gradiente real petróleo→âmbar, avatares com iniciais */}
       {l.testimonials?.length ? (
