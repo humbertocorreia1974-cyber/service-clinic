@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { Card, CardBody } from '@/components/ui/card';
@@ -67,10 +68,12 @@ export default async function CatalogoPecasPage({
     <main>
       <header className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0">
-          <img
+          <Image
             src="/photos/tool-cart-organized.png"
             alt=""
-            className="h-full w-full object-cover opacity-[0.12]"
+            fill
+            sizes="100vw"
+            className="object-cover opacity-[0.12]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-bg/30 via-bg/80 to-bg" />
         </div>
