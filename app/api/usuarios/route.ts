@@ -20,6 +20,8 @@ export const STAFF_ROLES = [
     "engenheiro",
 ];
 
+const MIN_PASSWORD_LENGTH = 8;
+
 function randomPassword() {
     return (
         Math.random().toString(36).slice(-8) +
@@ -63,6 +65,12 @@ export async function POST(request: Request) {
                 { status: 400 }
             );
         }
+        if (passwordInput && passwordInput.length < MIN_PASSWORD_LENGTH) {
+            return NextResponse.json(
+                { error: `Senha deve ter pelo menos ${MIN_PASSWORD_LENGTH} caracteres.` },
+                { status: 400 }
+            );
+        }
 
         const existing = await prisma.user.findUnique({ where: { email } });
         if (existing) {
@@ -72,7 +80,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const password = passwordInput && passwordInput.length >= 6 ? passwordInput : randomPassword();
+        const password = passwordInput && passwordInput.length >= MIN_PASSWORD_LENGTH ? passwordInput : randomPassword();
         const passwordHash = await bcrypt.hash(password, 10);
 
         const user = await prisma.user.create({
