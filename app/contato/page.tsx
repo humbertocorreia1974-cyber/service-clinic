@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { Card, CardBody, CardTitle } from '@/components/ui/card';
 import { ContatoForm } from './contato-form';
@@ -36,10 +37,12 @@ export default async function ContatoPage({
     <main>
       <header className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0">
-          <img
+          <Image
             src="/photos/dental-chair.jpg"
             alt=""
-            className="h-full w-full object-cover opacity-[0.12]"
+            fill
+            sizes="100vw"
+            className="object-cover opacity-[0.12]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-bg/30 via-bg/80 to-bg" />
         </div>
@@ -80,10 +83,12 @@ export default async function ContatoPage({
 
           <aside className="space-y-4">
             <div className="relative h-40 overflow-hidden rounded-lg border border-border">
-              <img
+              <Image
                 src="/photos/ac-tech.jpg"
                 alt="Técnico Service Clinic em atendimento"
-                className="absolute inset-0 h-full w-full object-cover"
+                fill
+                sizes="(max-width: 1024px) 100vw, 320px"
+                className="object-cover"
               />
             </div>
             <Card>
