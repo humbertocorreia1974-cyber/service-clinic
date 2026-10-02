@@ -11,7 +11,12 @@
 // no token mas nunca era usado) pra contraste real, dá presença de verdade pro
 // âmbar (--accent) como segunda cor (não só ícone de 16px), e dá mais caráter
 // a steps/depoimentos/CTA em vez de repetir o mesmo cartão em todo lugar.
+//
+// 🩹 2026-10-02 (auditoria): fotos reais convertidas de <img> pra next/image
+// (otimização ligada em next.config.js) — ganho de performance real, sem mudar
+// nenhum layout visual.
 import Link from "next/link";
+import Image from "next/image";
 import * as Icons from "lucide-react";
 import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -133,11 +138,16 @@ export default function Home() {
             style={{ background: "linear-gradient(135deg, hsl(var(--brand) / 0.35), hsl(var(--accent) / 0.25))" }}
             aria-hidden
           />
-          <img
-            src="/photos/dental-chair.jpg"
-            alt="Consultório odontológico equipado, atendido pela Service Clinic"
-            className="h-[440px] w-full rounded-2xl border border-border object-cover shadow-2xl"
-          />
+          <div className="relative h-[440px] w-full overflow-hidden rounded-2xl border border-border shadow-2xl">
+            <Image
+              src="/photos/dental-chair.jpg"
+              alt="Consultório odontológico equipado, atendido pela Service Clinic"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              priority
+              className="object-cover"
+            />
+          </div>
           <div className="absolute -bottom-6 left-6 right-6 rounded-xl border border-border bg-surface-2/95 px-5 py-4 shadow-xl backdrop-blur">
             <div className="flex items-center gap-2 text-sm font-semibold text-fg">
               <Icons.MapPin className="h-4 w-4 text-accent" />
@@ -156,11 +166,15 @@ export default function Home() {
               className={`grid items-center gap-8 lg:grid-cols-2 lg:gap-14 ${fi % 2 === 1 ? "lg:[&>*:first-child]:order-2" : ""}`}
             >
               <div className="relative">
-                <img
-                  src={pillarPhotos[fi] || pillarPhotos[0]}
-                  alt={pillarAlt[fi] || f.title}
-                  className="h-72 w-full rounded-2xl border border-border object-cover shadow-lg lg:h-80"
-                />
+                <div className="relative h-72 w-full overflow-hidden rounded-2xl border border-border shadow-lg lg:h-80">
+                  <Image
+                    src={pillarPhotos[fi] || pillarPhotos[0]}
+                    alt={pillarAlt[fi] || f.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
                 <span className="absolute -left-3 -top-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-base font-bold text-accent-fg shadow-lg">
                   {String(fi + 1).padStart(2, "0")}
                 </span>
@@ -179,11 +193,15 @@ export default function Home() {
             {secondary.map((f: any, fi: number) =>
               fi === 0 ? (
                 <div key={f.title || fi} className="overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-sm">
-                  <img
-                    src="/photos/ac-tech.jpg"
-                    alt="Técnico realizando higienização de ar-condicionado em ambiente clínico"
-                    className="h-36 w-full object-cover"
-                  />
+                  <div className="relative h-36 w-full">
+                    <Image
+                      src="/photos/ac-tech.jpg"
+                      alt="Técnico realizando higienização de ar-condicionado em ambiente clínico"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 33vw"
+                      className="object-cover"
+                    />
+                  </div>
                   <div className="border-t-2 border-accent p-5">
                     <h4 className="text-sm font-semibold text-fg">{f.title || f.name}</h4>
                     <p className="mt-1 text-sm leading-relaxed text-fg-muted">{f.body || f.description || f.text}</p>
@@ -206,11 +224,13 @@ export default function Home() {
       {/* STEPS — foto real de fundo (consultório) com véu escuro, não é mais cor chapada */}
       {l.steps?.length ? (
         <section className="relative overflow-hidden border-y border-border">
-          <img
+          <Image
             src="/photos/clinic-reception.png"
             alt=""
             aria-hidden
-            className="absolute inset-0 h-full w-full object-cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
           />
           <div
             className="absolute inset-0"
@@ -239,11 +259,13 @@ export default function Home() {
       {/* AGENDA — marcação automática, taxa de deslocamento, tempo médio (não é "planos") */}
       {l.agenda?.length ? (
         <section id="agenda" className="relative overflow-hidden">
-          <img
+          <Image
             src="/photos/tool-cart-organized.png"
             alt=""
             aria-hidden
-            className="absolute inset-0 h-full w-full object-cover opacity-10"
+            fill
+            sizes="100vw"
+            className="object-cover opacity-10"
           />
           <div className="relative mx-auto max-w-5xl px-6 py-24">
           <div className="text-center">
@@ -267,10 +289,12 @@ export default function Home() {
 
       {/* FAIXA DE FOTO — técnico em ação, quebra o ritmo entre agenda e depoimentos */}
       <section className="relative h-64 overflow-hidden sm:h-80">
-        <img
+        <Image
           src="/photos/technician-hands-tools.png"
           alt="Técnico realizando manutenção de precisão em equipamento odontológico"
-          className="h-full w-full object-cover"
+          fill
+          sizes="100vw"
+          className="object-cover"
         />
         <div
           className="absolute inset-0 flex items-end"
