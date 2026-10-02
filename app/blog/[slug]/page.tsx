@@ -98,16 +98,14 @@ export default async function BlogPostPage({
           ) : null}
         </header>
 
-        {post.coverImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={post.coverImageUrl}
-            alt={post.title}
-            className="mb-8 w-full rounded-lg border border-border"
-          />
-        ) : null}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={post.coverImageUrl || '/photos/dental-tools.jpg'}
+          alt={post.title}
+          className="mb-8 w-full rounded-lg border border-border object-cover"
+        />
 
-        <div className="prose prose-invert max-w-none whitespace-pre-wrap text-fg">
+        <div className="prose max-w-none whitespace-pre-wrap text-fg">
           {post.content}
         </div>
       </article>
@@ -115,11 +113,11 @@ export default async function BlogPostPage({
       <Card className="mt-12">
         <CardBody>
           <h2 className="font-display text-xl font-semibold text-fg">
-            Precisa de manutenção ou laudo PMOC?
+            Precisa de manutenção?
           </h2>
           <p className="mt-2 text-sm text-fg-muted">
             Fale com a Service Clinic — atendemos Volta Redonda, Pinheiral, Barra Mansa, Resende e
-            Barra do Piraí com ordens de serviço, laudos assinados e agenda por técnico.
+            Barra do Piraí com ordens de serviço, registro técnico assinado e agenda por técnico.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link href="/contato">
