@@ -36,7 +36,8 @@ export default function LoginPage() {
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-30 [background:radial-gradient(40rem_30rem_at_20%_10%,hsl(var(--brand-fg)/0.18),transparent_60%),radial-gradient(30rem_24rem_at_90%_90%,hsl(var(--brand-fg)/0.12),transparent_60%)]"
         />
-        <Link href="/" className="relative text-lg font-semibold tracking-tight">
+        <Link href="/" className="relative flex items-center gap-3 text-lg font-semibold tracking-tight">
+          <img src="/logo.svg" alt="Service Clinic" className="h-10 w-10 rounded-lg" />
           Service Clinic
         </Link>
         <div className="relative">
@@ -57,7 +58,8 @@ export default function LoginPage() {
       {/* formulário */}
       <div className="flex flex-col justify-center px-6 py-12 sm:px-12">
         <div className="mx-auto w-full max-w-sm">
-          <Link href="/" className="mb-8 inline-block text-base font-semibold tracking-tight lg:hidden">
+          <Link href="/" className="mb-8 inline-flex items-center gap-2 text-base font-semibold tracking-tight lg:hidden">
+            <img src="/logo.svg" alt="Service Clinic" className="h-8 w-8 rounded-lg" />
             Service Clinic
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight">Entrar</h1>
@@ -83,9 +85,8 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-fg-muted">
-            Não tem conta?{" "}
-            <Link href="/register" className="font-medium text-brand hover:underline">Criar conta</Link>
+          <p className="mt-6 text-center text-xs text-fg-muted">
+            Sem conta? Sua conta é criada por um administrador da empresa.
           </p>
         </div>
       </div>
