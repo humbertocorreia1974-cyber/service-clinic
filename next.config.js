@@ -24,7 +24,9 @@ const csp = [
 ].join('; ');
 
 const nextConfig = {
-  images: { unoptimized: true },
+  // Otimização de imagem do Next ligada: as fotos reais do app (public/photos)
+  // são locais, sem domínio externo, então não precisa de remotePatterns.
+  images: { unoptimized: false },
   async headers() {
     return [{ source: '/(.*)', headers: [
       { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
