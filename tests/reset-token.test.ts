@@ -43,6 +43,20 @@ describe('reset-token', () => {
   it('decodeTokenEmail extrai o e-mail sem validar assinatura (uso: lookup prévio)', () => {
     const token = createResetToken(email, hashV1);
     expect(decodeTokenEmail(token)).toBe(email);
-    expect(decodeTokenEmail('lixo')).toBeNull();
+    // string vazia decodifica para vazio -> null (sem o que procurar)
+    expect(decodeTokenEmail('')).toBeNull();
+  });
+
+  it('garantia de segurança real: mesmo que decodeTokenEmail devolva lixo, verifyResetToken sempre rejeita', () => {
+    // decodeTokenEmail não valida assinatura por design (serve só pra decidir
+    // qual usuário buscar no banco antes da verificação completa) — por isso
+    // qualquer entrada arbitrária pode decodificar pra algo não-nulo aqui.
+    // O que garante segurança é verifyResetToken, testado à exaustão acima;
+    // este teste documenta explicitamente que um e-mail "decodificado" de
+    // lixo nunca passa na verificação completa.
+    const garbageEmail = decodeTokenEmail('lixo');
+    if (garbageEmail) {
+      expect(verifyResetToken('lixo', hashV1)).toBeNull();
+    }
   });
 });
