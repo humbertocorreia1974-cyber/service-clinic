@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { Card, CardTitle, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,10 +83,12 @@ export default async function ServicosPage() {
     <main>
       <header className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0">
-          <img
+          <Image
             src="/photos/clinic-reception.png"
             alt=""
-            className="h-full w-full object-cover opacity-[0.14]"
+            fill
+            sizes="100vw"
+            className="object-cover opacity-[0.14]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-bg/40 via-bg/80 to-bg" />
         </div>
@@ -111,7 +114,7 @@ export default async function ServicosPage() {
             return (
               <Card key={s.id} className="flex flex-col overflow-hidden !p-0">
                 <div className="relative h-36 w-full overflow-hidden">
-                  <img src={photo} alt="" className="h-full w-full object-cover" />
+                  <Image src={photo} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
                   <div className="absolute bottom-3 left-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-surface text-brand shadow">
                     <Icon className="h-5 w-5" />
@@ -135,10 +138,12 @@ export default async function ServicosPage() {
         <div className="mt-16 overflow-hidden rounded-lg border border-border">
           <div className="relative grid md:grid-cols-2">
             <div className="relative min-h-[220px]">
-              <img
+              <Image
                 src="/photos/technician-hands-tools.png"
                 alt="Técnico Service Clinic preparando ferramentas"
-                className="absolute inset-0 h-full w-full object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
               />
             </div>
             <div className="flex flex-col justify-center bg-surface p-8">
