@@ -28,7 +28,7 @@ function RedefinirSenhaForm() {
     <main style={{ maxWidth: 400, margin: '4rem auto', padding: '0 1.5rem' }}>
       <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Nova senha</h1>
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <input type="password" required minLength={6} placeholder="Nova senha (mín. 6 caracteres)" value={password} onChange={(e) => setPassword(e.target.value)} style={{ padding: 10, borderRadius: 8, border: '1px solid #ddd' }} />
+        <input type="password" required minLength={8} placeholder="Nova senha (mín. 8 caracteres)" value={password} onChange={(e) => setPassword(e.target.value)} style={{ padding: 10, borderRadius: 8, border: '1px solid #ddd' }} />
         <button type="submit" disabled={loading} style={{ padding: 10, borderRadius: 8, border: 0, background: '#111827', color: '#fff', cursor: 'pointer' }}>{loading ? 'Salvando…' : 'Redefinir senha'}</button>
       </form>
       {msg && <p style={{ marginTop: 12 }}>{msg}</p>}
