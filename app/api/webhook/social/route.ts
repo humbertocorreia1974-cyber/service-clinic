@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,11 +30,33 @@ export async function GET(request: Request) {
   }
 }
 
+// Confere a assinatura HMAC-SHA256 que a Meta envia no header
+// X-Hub-Signature-256 (calculada sobre o corpo cru, com o App Secret).
+// Sem isso, qualquer um pode forjar um POST fingindo ser o Instagram/
+// Facebook. Se META_APP_SECRET não estiver configurado, falha fechado
+// (rejeita) em vez de aceitar sem checagem.
+function isValidSignature(rawBody: string, signatureHeader: string | null): boolean {
+  const secret = process.env.META_APP_SECRET;
+  if (!secret || !signatureHeader) return false;
+  const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+  const a = Buffer.from(signatureHeader);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+
 // Mensagem recebida (Instagram/Facebook DM) -> encaminha pro cérebro
 // unificado do Assistente JGNEXT (mesmo endpoint do chat embutido/WhatsApp).
 export async function POST(request: Request) {
   try {
-  const body = await request.json().catch(() => null);
+  const rawBody = await request.text();
+
+  if (!isValidSignature(rawBody, request.headers.get('x-hub-signature-256'))) {
+    console.warn('[social webhook] assinatura inválida ou META_APP_SECRET ausente — requisição rejeitada');
+    return NextResponse.json({ error: 'assinatura inválida' }, { status: 401 });
+  }
+
+  const body = (() => { try { return JSON.parse(rawBody); } catch { return null; } })();
   const base = process.env.JGNEXT_API_BASE_URL;
   const token = process.env.JGNEXT_CHATBOT_TOKEN;
   if (!base || !token || !body) return NextResponse.json({ received: true });
