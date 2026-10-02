@@ -11,10 +11,10 @@ export function AppNav() {
   const pathname = usePathname() || '/';
   if (HIDE.some((re) => re.test(pathname))) return null;
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/80 backdrop-blur">
-      <nav className="mx-auto flex h-14 max-w-6xl items-center gap-1 overflow-x-auto px-4">
-        <Link href="/dashboard" className="mr-2 flex shrink-0 items-center gap-2 font-semibold tracking-tight">
-          <img src="/logo.svg" alt="Service Clinic" className="h-6 w-6 rounded" />
+    <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur">
+      <nav className="mx-auto flex h-20 max-w-6xl items-center gap-1 overflow-x-auto px-4">
+        <Link href="/dashboard" className="mr-4 flex shrink-0 items-center gap-3 text-lg font-bold tracking-tight">
+          <img src="/logo.svg" alt="Service Clinic" className="h-12 w-12 rounded-xl shadow-md shadow-brand/20" />
           Service Clinic
         </Link>
         {LINKS.map((l) => {
