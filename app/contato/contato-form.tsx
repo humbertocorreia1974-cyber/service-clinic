@@ -187,7 +187,7 @@ export function ContatoForm({
           <option value="">Selecione…</option>
           <option value="Manutenção preventiva">Manutenção preventiva</option>
           <option value="Manutenção corretiva">Manutenção corretiva</option>
-          <option value="Higienização de AC / PMOC">Higienização de AC / PMOC</option>
+          <option value="Higienização de ar-condicionado">Higienização de ar-condicionado</option>
           <option value="Peças de reposição">Peças de reposição</option>
           <option value="Contrato de preventiva">Contrato de preventiva</option>
           <option value="Outro">Outro</option>
