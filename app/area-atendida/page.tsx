@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { Card, CardTitle, CardBody } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,10 +45,12 @@ export default async function AreaAtendidaPage() {
     <main>
       <header className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0">
-          <img
+          <Image
             src="/photos/tools-tray.jpg"
             alt=""
-            className="h-full w-full object-cover opacity-[0.12]"
+            fill
+            sizes="100vw"
+            className="object-cover opacity-[0.12]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-bg/30 via-bg/80 to-bg" />
         </div>
