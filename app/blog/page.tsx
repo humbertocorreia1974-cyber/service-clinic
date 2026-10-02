@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { Card, CardBody } from '@/components/ui/card';
@@ -62,10 +63,12 @@ export default async function BlogPage({
     <main>
       <header className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0">
-          <img
+          <Image
             src="/photos/clinic-reception.png"
             alt=""
-            className="h-full w-full object-cover opacity-[0.12]"
+            fill
+            sizes="100vw"
+            className="object-cover opacity-[0.12]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-bg/30 via-bg/80 to-bg" />
         </div>
@@ -139,11 +142,22 @@ export default async function BlogPage({
               <Link key={p.id} href={`/blog/${p.slug}`} className="group">
                 <Card className="flex h-full flex-col overflow-hidden !p-0 transition-all duration-150 hover:border-brand/50">
                   <div className="relative h-36 w-full overflow-hidden">
-                    <img
-                      src={p.coverImageUrl || FALLBACK_COVERS[i % FALLBACK_COVERS.length]}
-                      alt=""
-                      className="h-full w-full object-cover"
-                    />
+                    {p.coverImageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={p.coverImageUrl}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Image
+                        src={FALLBACK_COVERS[i % FALLBACK_COVERS.length]}
+                        alt=""
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    )}
                   </div>
                   <CardBody className="flex flex-1 flex-col">
                     <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-fg-muted">
