@@ -4,8 +4,14 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 // Mapa recurso-da-URL -> acessor Prisma (gerado do schema).
+// "user" foi removido de propósito: o acessor do Prisma devolve o registro
+// inteiro, incluindo passwordHash, sem nenhuma seleção de campos — expor
+// isso atrás de uma chave de API genérica (ainda que hoje
+// `APP_API_KEYS` não esteja configurada em produção) é uma porta pra
+// vazar hash de senha de todo mundo caso a chave seja ativada no futuro
+// pra alguma integração. Autenticação/usuário tem rota própria protegida
+// por sessão (next-auth) — não deve passar por aqui.
 const RESOURCES: Record<string, string> = {
-  "user": "user",
   "project": "project",
   "client": "client",
   "technician": "technician",
