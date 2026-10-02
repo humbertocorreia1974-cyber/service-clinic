@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { escapeHtml } from "@/lib/escape-html";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +18,11 @@ const VALID_SOURCES = [
 export async function POST(request: Request) {
   try {
   try {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (!checkRateLimit(`leads:${ip}`, 10, 10 * 60 * 1000)) {
+      return NextResponse.json({ error: "Muitas solicitações. Tente novamente em alguns minutos." }, { status: 429 });
+    }
+
     const body = await request.json();
     const name = String(body?.name ?? "").trim();
     const phone = String(body?.phone ?? "").trim();
@@ -68,13 +75,13 @@ export async function POST(request: Request) {
         subject: `Novo lead: ${subject ?? "Orçamento"} — ${name}`,
         html: `
           <h2>Novo pedido de orçamento</h2>
-          <p><strong>Nome:</strong> ${name}</p>
-          <p><strong>Telefone:</strong> ${phone}</p>
-          <p><strong>Cidade:</strong> ${city}</p>
-          ${email ? `<p><strong>E-mail:</strong> ${email}</p>` : ""}
-          ${subject ? `<p><strong>Assunto:</strong> ${subject}</p>` : ""}
-          ${message ? `<p><strong>Mensagem:</strong><br/>${message}</p>` : ""}
-          <p><strong>Origem:</strong> ${source}</p>
+          <p><strong>Nome:</strong> ${escapeHtml(name)}</p>
+          <p><strong>Telefone:</strong> ${escapeHtml(phone)}</p>
+          <p><strong>Cidade:</strong> ${escapeHtml(city)}</p>
+          ${email ? `<p><strong>E-mail:</strong> ${escapeHtml(email)}</p>` : ""}
+          ${subject ? `<p><strong>Assunto:</strong> ${escapeHtml(subject)}</p>` : ""}
+          ${message ? `<p><strong>Mensagem:</strong><br/>${escapeHtml(message)}</p>` : ""}
+          <p><strong>Origem:</strong> ${escapeHtml(source)}</p>
           <p><a href="${process.env.NEXTAUTH_URL ?? ""}/leads">Ver no painel</a></p>
         `,
       });
