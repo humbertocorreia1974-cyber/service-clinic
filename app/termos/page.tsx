@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
   title: 'Termos de Uso | Service Clinic',
   robots: { index: false },
 };
 
-function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section id={id} className="scroll-mt-20 border-t border-border py-8 first:border-t-0 first:pt-0">
       <h2 className="font-display text-xl font-semibold text-fg">{title}</h2>
