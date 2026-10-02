@@ -24,6 +24,25 @@ export const dynamic = 'force-dynamic';
 
 const MAX_BYTES = 8 * 1024 * 1024; // mesmo limite do gateway (appStorageGatewayRoutes.js)
 
+// Allowlist por tipo MIME + extensão — evita upload de HTML/SVG com script,
+// executáveis etc. Cobre o uso real do app (fotos de evidência da OS,
+// documentos/laudos em PDF).
+const ALLOWED_MIME = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+  'application/pdf',
+]);
+const ALLOWED_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.pdf']);
+
+function hasAllowedExtension(name: string): boolean {
+  const dot = name.lastIndexOf('.');
+  if (dot < 0) return false;
+  return ALLOWED_EXT.has(name.slice(dot).toLowerCase());
+}
+
 export async function POST(request: Request) {
   try {
   try {
@@ -38,6 +57,14 @@ export async function POST(request: Request) {
     }
     if (file.size > MAX_BYTES) {
       return NextResponse.json({ error: `Arquivo maior que ${MAX_BYTES / (1024 * 1024)}MB.` }, { status: 413 });
+    }
+    const mimeOk = !file.type || ALLOWED_MIME.has(file.type);
+    const extOk = hasAllowedExtension(file.name || '');
+    if (!mimeOk || !extOk) {
+      return NextResponse.json(
+        { error: 'Tipo de arquivo não permitido. Envie imagem (jpg, png, webp, heic) ou PDF.' },
+        { status: 415 }
+      );
     }
     const buffer = Buffer.from(await file.arrayBuffer());
     const result = await uploadFile(file.name, buffer.toString('base64'));
