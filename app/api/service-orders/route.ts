@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getErrorMessage, getErrorStack } from "@/lib/error-info";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    if (!["admin", "gerente"].includes(session.user.role)) {
+    if (!["admin", "gerente"].includes(session.user.role ?? "")) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
 
@@ -59,13 +60,16 @@ export async function POST(request: Request) {
 
     const code = `OS-${Date.now().toString(36).toUpperCase()}`;
 
+    // session.user.id vem sempre preenchido aqui (callback jwt/session em
+    // lib/auth.ts sempre define) — o tipo é opcional só porque o augmento
+    // do next-auth declara `id?: string` de forma genérica.
     const os = await prisma.serviceOrder.create({
       data: {
         code,
         clientId,
         technicianId,
         assignedToId,
-        createdById: session.user.id,
+        createdById: session.user.id as string,
         type,
         city,
         address,
@@ -94,8 +98,8 @@ export async function POST(request: Request) {
       await reportRuntimeError({
         type: "server",
         file: "app/api/service-orders/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch {
       /* relatar erro nunca pode gerar outro erro */
