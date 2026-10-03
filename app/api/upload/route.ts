@@ -19,6 +19,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { uploadFile } from '@/lib/storage';
+import { getErrorMessage, getErrorStack } from '@/lib/error-info';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,8 +81,8 @@ export async function POST(request: Request) {
       await reportRuntimeError({
         type: 'server',
         file: "app/api/upload/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch (__jgnextApiErrorReportReportErr) { /* relatar erro nunca pode gerar outro erro */ }
     throw __jgnextApiErrorReportErr;
