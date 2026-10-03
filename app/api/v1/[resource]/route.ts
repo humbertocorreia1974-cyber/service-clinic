@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getErrorMessage, getErrorStack } from '@/lib/error-info';
 
 export const dynamic = 'force-dynamic';
 
@@ -84,8 +85,8 @@ export async function GET(req: Request, { params }: { params: { resource: string
       await reportRuntimeError({
         type: 'server',
         file: "app/api/v1/[resource]/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch (__jgnextApiErrorReportReportErr) { /* relatar erro nunca pode gerar outro erro */ }
     throw __jgnextApiErrorReportErr;
@@ -113,8 +114,8 @@ export async function POST(req: Request, { params }: { params: { resource: strin
       await reportRuntimeError({
         type: 'server',
         file: "app/api/v1/[resource]/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch (__jgnextApiErrorReportReportErr) { /* relatar erro nunca pode gerar outro erro */ }
     throw __jgnextApiErrorReportErr;
@@ -143,8 +144,8 @@ export async function PATCH(req: Request, { params }: { params: { resource: stri
       await reportRuntimeError({
         type: 'server',
         file: "app/api/v1/[resource]/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch (__jgnextApiErrorReportReportErr) { /* relatar erro nunca pode gerar outro erro */ }
     throw __jgnextApiErrorReportErr;
@@ -172,8 +173,8 @@ export async function DELETE(req: Request, { params }: { params: { resource: str
       await reportRuntimeError({
         type: 'server',
         file: "app/api/v1/[resource]/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch (__jgnextApiErrorReportReportErr) { /* relatar erro nunca pode gerar outro erro */ }
     throw __jgnextApiErrorReportErr;
