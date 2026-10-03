@@ -2,6 +2,7 @@ import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getErrorMessage, getErrorStack } from '@/lib/error-info';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,8 +60,8 @@ export async function GET(request: Request) {
       await reportRuntimeError({
         type: 'server',
         file: "app/api/public/parts/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch (__jgnextApiErrorReportReportErr) { /* relatar erro nunca pode gerar outro erro */ }
     throw __jgnextApiErrorReportErr;
