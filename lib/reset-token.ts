@@ -43,7 +43,11 @@ export function verifyResetToken(token: string, currentPasswordHash: string): { 
     const payload = `${email}:${exp}:${fp}`;
     const expected = crypto.createHmac('sha256', SECRET).update(payload).digest('hex');
     if (sig.length !== expected.length) return null;
-    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
+    // Uint8Array.from(...) em vez de passar o Buffer direto: evita o
+    // conflito de tipos entre o Buffer do Node e o ArrayBufferView do DOM
+    // (lib do tsconfig inclui "dom") sem mudar nada em runtime — Buffer já
+    // É um Uint8Array por baixo.
+    if (!crypto.timingSafeEqual(Uint8Array.from(Buffer.from(sig)), Uint8Array.from(Buffer.from(expected)))) return null;
 
     if (fp !== fingerprint(currentPasswordHash)) return null; // senha já foi trocada — link usado
 
