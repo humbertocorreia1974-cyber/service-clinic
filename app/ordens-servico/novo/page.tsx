@@ -14,7 +14,7 @@ const CIDADES = ["Volta Redonda", "Pinheiral", "Barra Mansa", "Resende", "Barra 
 export default async function NovaOSPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login?next=/ordens-servico/novo");
-  if (!["admin", "gerente"].includes(session.user.role)) redirect("/dashboard");
+  if (!["admin", "gerente"].includes(session.user.role ?? "")) redirect("/dashboard");
 
   const [clients, technicians] = await Promise.all([
     prisma.client.findMany({ orderBy: { nomeFantasia: "asc" }, select: { id: true, nomeFantasia: true, addressCity: true } }),
