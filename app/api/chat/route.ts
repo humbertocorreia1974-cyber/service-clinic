@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getErrorMessage, getErrorStack } from '@/lib/error-info';
 
 export async function POST(request: Request) {
   try {
@@ -21,8 +22,8 @@ export async function POST(request: Request) {
       await reportRuntimeError({
         type: 'server',
         file: "app/api/chat/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch (__jgnextApiErrorReportReportErr) { /* relatar erro nunca pode gerar outro erro */ }
     throw __jgnextApiErrorReportErr;
