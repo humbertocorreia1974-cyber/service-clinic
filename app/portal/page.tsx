@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { PortalServiceOrderCard } from "./service-order-card";
 import { buildPixPayload, getPixConfig } from "@/lib/pix";
+import { isMercadoPagoConfigured } from "@/lib/mercadopago";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Portal do cliente · Service Clinic" };
@@ -21,13 +22,14 @@ export default async function PortalPage() {
     include: {
       technician: { select: { name: true, phone: true } },
       review: { select: { rating: true, comment: true } },
-      invoiceItems: { include: { invoice: { select: { status: true, total: true } } } },
+      invoiceItems: { include: { invoice: { select: { id: true, status: true, total: true } } } },
     },
     orderBy: { createdAt: "desc" },
     take: 30,
   });
 
   const pixConfig = getPixConfig();
+  const mercadoPagoEnabled = isMercadoPagoConfigured();
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -43,6 +45,7 @@ export default async function PortalPage() {
           orders.map((os) => {
             const pendingInvoiceItem = os.invoiceItems.find((i) => i.invoice.status === "pendente");
             const pendingInvoiceTotal = pendingInvoiceItem ? Number(pendingInvoiceItem.invoice.total) : null;
+            const pendingInvoiceId = pendingInvoiceItem ? pendingInvoiceItem.invoice.id : null;
 
             // O payload Pix inclui o valor, então é gerado aqui (server-side)
             // por cobrança, não globalmente — cada OS com cobrança pendente
@@ -71,7 +74,9 @@ export default async function PortalPage() {
                 clientApprovedAt={os.clientApprovedAt ? os.clientApprovedAt.toISOString() : null}
                 review={os.review ? { rating: os.review.rating, comment: os.review.comment } : null}
                 pendingInvoiceTotal={pendingInvoiceTotal}
+                pendingInvoiceId={pendingInvoiceId}
                 pixPayload={pixPayload}
+                mercadoPagoEnabled={mercadoPagoEnabled}
               />
             );
           })

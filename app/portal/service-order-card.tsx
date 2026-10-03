@@ -32,7 +32,9 @@ export function PortalServiceOrderCard({
   clientApprovedAt,
   review,
   pendingInvoiceTotal,
+  pendingInvoiceId,
   pixPayload,
+  mercadoPagoEnabled,
 }: {
   id: string;
   code: string;
@@ -44,7 +46,9 @@ export function PortalServiceOrderCard({
   clientApprovedAt: string | null;
   review: { rating: number; comment: string | null } | null;
   pendingInvoiceTotal: number | null;
+  pendingInvoiceId: string | null;
   pixPayload: string | null;
+  mercadoPagoEnabled: boolean;
 }) {
   const router = useRouter();
   const [aprovando, setAprovando] = useState(false);
@@ -54,6 +58,7 @@ export function PortalServiceOrderCard({
   const [comentario, setComentario] = useState("");
   const [enviado, setEnviado] = useState(!!review);
   const [erro, setErro] = useState<string | null>(null);
+  const [pagando, setPagando] = useState(false);
 
   const s = STATUS_LABEL[status] ?? { label: status, cls: "border-border bg-bg text-fg-muted" };
 
@@ -69,6 +74,25 @@ export function PortalServiceOrderCard({
       setErro("Não foi possível aprovar agora. Tente de novo.");
     } finally {
       setAprovando(false);
+    }
+  }
+
+  async function pagarOnline() {
+    if (!pendingInvoiceId) return;
+    setPagando(true);
+    setErro(null);
+    try {
+      const res = await fetch("/api/mercadopago/create-preference", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ invoiceId: pendingInvoiceId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.initPoint) throw new Error(data?.error ?? "Falha ao iniciar pagamento");
+      window.location.href = data.initPoint;
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : "Não foi possível iniciar o pagamento agora.");
+      setPagando(false);
     }
   }
 
@@ -123,6 +147,13 @@ export function PortalServiceOrderCard({
               Pague via PIX, cartão ou dinheiro diretamente com nossa equipe — a confirmação do recebimento é feita manualmente.
             </p>
           )}
+          {mercadoPagoEnabled && pendingInvoiceId ? (
+            <div className="mt-3">
+              <Button size="sm" variant="secondary" onClick={pagarOnline} disabled={pagando}>
+                {pagando ? "Abrindo pagamento…" : "Pagar online (cartão, boleto ou Pix)"}
+              </Button>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
