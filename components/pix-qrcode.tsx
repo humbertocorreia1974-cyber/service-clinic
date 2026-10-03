@@ -2,36 +2,43 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-// Carrega a lib "qrcode" via CDN em vez de instalar no node_modules
-// compartilhado da plataforma — mesmo padrão já usado em components/map-view.tsx
-// pro Leaflet. unpkg.com já está liberado no CSP (next.config.js) por causa
-// do mapa, então não precisa de mudança adicional de política.
-const QRCODE_JS = 'https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js';
+// Carrega "qrcode-generator" (Kazuhiko Arase, MIT) via CDN em vez de instalar
+// no node_modules compartilhado da plataforma — mesmo padrão já usado em
+// components/map-view.tsx pro Leaflet. unpkg.com já está liberado no CSP
+// (next.config.js) por causa do mapa, então não precisa de mudança de
+// política. 2026-10-03: o pacote "qrcode" (npm) NÃO publica um bundle
+// pronto pro browser (só CommonJS, 404 real em unpkg) - "qrcode-generator"
+// publica o arquivo plano `qrcode.js` que já expõe `window.qrcode` e tem
+// `renderTo2dContext` embutido, então desenha direto no canvas sem precisar
+// decodificar a bitmap manualmente.
+const QRCODE_JS = 'https://unpkg.com/qrcode-generator@1.4.4/qrcode.js';
 
 let qrLoadPromise: Promise<any> | null = null;
 
 function loadQrLib(): Promise<any> {
   if (typeof window === 'undefined') return Promise.resolve(null);
-  if ((window as any).QRCode) return Promise.resolve((window as any).QRCode);
+  if ((window as any).qrcode) return Promise.resolve((window as any).qrcode);
   if (qrLoadPromise) return qrLoadPromise;
 
   qrLoadPromise = new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[src="${QRCODE_JS}"]`);
     if (existing) {
-      existing.addEventListener('load', () => resolve((window as any).QRCode));
+      existing.addEventListener('load', () => resolve((window as any).qrcode));
       existing.addEventListener('error', reject);
       return;
     }
     const script = document.createElement('script');
     script.src = QRCODE_JS;
     script.async = true;
-    script.onload = () => resolve((window as any).QRCode);
+    script.onload = () => resolve((window as any).qrcode);
     script.onerror = reject;
     document.body.appendChild(script);
   });
 
   return qrLoadPromise;
 }
+
+const CELL_SIZE = 5;
 
 export function PixQrCode({ payload, amountLabel }: { payload: string; amountLabel: string }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -41,11 +48,20 @@ export function PixQrCode({ payload, amountLabel }: { payload: string; amountLab
   useEffect(() => {
     let cancelled = false;
     loadQrLib()
-      .then((QRCode) => {
-        if (cancelled || !QRCode || !canvasRef.current) return;
-        QRCode.toCanvas(canvasRef.current, payload, { width: 176, margin: 1 }, (err: unknown) => {
-          if (err && !cancelled) setFailed(true);
-        });
+      .then((qrcodeLib) => {
+        if (cancelled || !qrcodeLib || !canvasRef.current) return;
+        // typeNumber 0 = a lib escolhe a menor versão de QR que cabe o payload;
+        // nível M (15% de correção de erro) é o equilíbrio padrão pra Pix.
+        const qr = qrcodeLib(0, 'M');
+        qr.addData(payload);
+        qr.make();
+        const moduleCount = qr.getModuleCount();
+        const canvas = canvasRef.current;
+        canvas.width = moduleCount * CELL_SIZE;
+        canvas.height = moduleCount * CELL_SIZE;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { setFailed(true); return; }
+        qr.renderTo2dContext(ctx, CELL_SIZE);
       })
       .catch(() => {
         if (!cancelled) setFailed(true);
@@ -69,7 +85,7 @@ export function PixQrCode({ payload, amountLabel }: { payload: string; amountLab
   return (
     <div className="mt-3 flex flex-col items-center gap-2 rounded-md border border-border bg-surface p-4 sm:flex-row sm:items-start">
       {!failed ? (
-        <canvas ref={canvasRef} width={176} height={176} className="shrink-0 rounded bg-white p-2" />
+        <canvas ref={canvasRef} className="h-44 w-44 shrink-0 rounded bg-white p-2" />
       ) : (
         <div className="flex h-44 w-44 shrink-0 items-center justify-center rounded border border-dashed border-border text-center text-xs text-fg-muted">
           Não foi possível carregar o QR Code agora — use o código copia e cola abaixo.
