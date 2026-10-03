@@ -11,8 +11,8 @@ function hasValidInternalToken(request: Request): boolean {
   if (!expected) return false;
   const provided = request.headers.get('x-internal-token') || '';
   try {
-    const a = Buffer.from(provided);
-    const b = Buffer.from(expected);
+    const a = Uint8Array.from(Buffer.from(provided));
+    const b = Uint8Array.from(Buffer.from(expected));
     return a.length === b.length && crypto.timingSafeEqual(a, b);
   } catch {
     return false;
