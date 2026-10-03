@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { STAFF_ROLES } from "../route";
+import { STAFF_ROLES } from "@/lib/staff-roles";
+import { getErrorMessage, getErrorStack } from "@/lib/error-info";
 
 export const dynamic = "force-dynamic";
 
@@ -48,8 +49,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
             await reportRuntimeError({
                 type: "server",
                 file: "app/api/usuarios/[id]/route.ts",
-                message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-                stack: __jgnextApiErrorReportErr?.stack,
+                message: getErrorMessage(__jgnextApiErrorReportErr),
+                stack: getErrorStack(__jgnextApiErrorReportErr),
             });
         } catch {
             /* relatar erro nunca pode gerar outro erro */
