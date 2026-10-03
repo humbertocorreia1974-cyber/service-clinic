@@ -35,8 +35,8 @@ export default function PrivacidadePage() {
       <p className="mt-6 text-sm leading-relaxed text-fg-muted">
         Esta política explica, em linguagem direta, quais dados a Service Clinic coleta através
         deste aplicativo, por quê, por quanto tempo, com quem compartilha e quais direitos você
-        tem sobre eles — em conformidade com a Lei Geral de Proteção de Dados Pessoais
-        (LGPD — Lei nº 13.709/2018).
+        tem sobre eles - em conformidade com a Lei Geral de Proteção de Dados Pessoais
+        (LGPD - Lei nº 13.709/2018).
       </p>
 
       <nav className="mt-8 rounded-lg border border-border bg-surface/70 p-5 text-sm">
@@ -72,7 +72,7 @@ export default function PrivacidadePage() {
           <p>
             A infraestrutura técnica (hospedagem, banco de dados e o próprio software deste
             aplicativo) é operada pela plataforma <strong>JGNEXT</strong>, que atua como
-            <strong> operadora</strong> — trata os dados apenas seguindo as instruções da Service
+            <strong> operadora</strong> - trata os dados apenas seguindo as instruções da Service
             Clinic, nunca por conta própria.
           </p>
         </Section>
@@ -80,13 +80,13 @@ export default function PrivacidadePage() {
         <Section id="dados-coletados" title="2. Quais dados coletamos">
           <p>Coletamos apenas o que é necessário para prestar o serviço de manutenção contratado:</p>
           <ul className="list-disc space-y-1.5 pl-5">
-            <li><strong>Dados de cadastro e login:</strong> nome, e-mail e senha (armazenada apenas de forma criptografada — nunca em texto legível).</li>
+            <li><strong>Dados de cadastro e login:</strong> nome, e-mail e senha (armazenada apenas de forma criptografada - nunca em texto legível).</li>
             <li><strong>Dados da clínica/cliente:</strong> razão social ou nome fantasia, endereço, cidade e telefone de contato.</li>
             <li><strong>Dados de orçamento/contato (formulário público):</strong> nome, telefone, cidade, e-mail (opcional), assunto e mensagem de quem solicita um orçamento, mesmo sem ainda ser cliente.</li>
             <li><strong>Dados da ordem de serviço:</strong> equipamento atendido, checklist técnico preenchido pelo técnico, fotos de evidência (antes/depois), assinatura digital de aprovação do responsável pela clínica, materiais usados e status do atendimento.</li>
             <li><strong>Dados financeiros do atendimento:</strong> valor cobrado e status de pagamento da ordem de serviço (não processamos cartão de crédito diretamente neste aplicativo).</li>
             <li><strong>Avaliações:</strong> nota e comentário deixados pelo cliente após o atendimento.</li>
-            <li><strong>Dados técnicos de uso:</strong> endereço IP e registros de acesso, usados apenas para segurança (ex.: limitar tentativas de login) — nunca para perfilamento de marketing.</li>
+            <li><strong>Dados técnicos de uso:</strong> endereço IP e registros de acesso, usados apenas para segurança (ex.: limitar tentativas de login) - nunca para perfilamento de marketing.</li>
           </ul>
           <p>
             Não coletamos dados sensíveis na acepção do art. 5º, II da LGPD (origem racial, convicção
@@ -114,17 +114,17 @@ export default function PrivacidadePage() {
             <li><strong>Legítimo interesse</strong> (art. 7º, IX): resposta a pedidos de orçamento de quem ainda não é cliente, e registros de segurança de acesso.</li>
             <li><strong>Cumprimento de obrigação legal</strong> (art. 7º, II): guarda de documentos fiscais pelo prazo exigido por lei.</li>
           </ul>
-          <p>Não usamos consentimento como base para finalidades que podem ser atendidas por essas hipóteses — isso evita pedir &quot;aceite&quot; de algo que já é necessário pra te atender.</p>
+          <p>Não usamos consentimento como base para finalidades que podem ser atendidas por essas hipóteses - isso evita pedir &quot;aceite&quot; de algo que já é necessário pra te atender.</p>
         </Section>
 
         <Section id="compartilhamento" title="5. Com quem compartilhamos">
           <p>Não vendemos dados pessoais. Compartilhamos apenas com:</p>
           <ul className="list-disc space-y-1.5 pl-5">
-            <li><strong>JGNEXT</strong> (operadora técnica) — hospedagem e funcionamento do aplicativo.</li>
-            <li><strong>Vercel Inc.</strong — hospedagem da aplicação (infraestrutura nos EUA).</li>
-            <li><strong>Neon Database</strong — banco de dados gerenciado (infraestrutura nos EUA).</li>
-            <li><strong>Provedor de e-mail</strong — envio de notificações e redefinição de senha.</li>
-            <li><strong>WhatsApp/Meta</strong — quando o contato é feito ou respondido por esse canal.</li>
+            <li><strong>JGNEXT</strong> (operadora técnica) - hospedagem e funcionamento do aplicativo.</li>
+            <li><strong>Vercel Inc.</strong> - hospedagem da aplicação (infraestrutura nos EUA).</li>
+            <li><strong>Neon Database</strong> - banco de dados gerenciado (infraestrutura nos EUA).</li>
+            <li><strong>Provedor de e-mail</strong> - envio de notificações e redefinição de senha.</li>
+            <li><strong>WhatsApp/Meta</strong> - quando o contato é feito ou respondido por esse canal.</li>
             <li>Autoridades públicas, quando exigido por lei ou ordem judicial.</li>
           </ul>
           <p>
@@ -146,7 +146,7 @@ export default function PrivacidadePage() {
         <Section id="seguranca" title="7. Como protegemos os seus dados">
           <ul className="list-disc space-y-1.5 pl-5">
             <li>Conexão sempre criptografada (HTTPS/TLS).</li>
-            <li>Senhas armazenadas com hash criptográfico (bcrypt) — nunca em texto legível, nem por nós.</li>
+            <li>Senhas armazenadas com hash criptográfico (bcrypt) - nunca em texto legível, nem por nós.</li>
             <li>Acesso ao sistema segmentado por função: cliente, técnico e equipe administrativa só veem os dados relevantes ao seu papel.</li>
             <li>Cabeçalhos de segurança (CSP, proteção contra clickjacking) e limite de tentativas em formulários sensíveis (login, redefinição de senha).</li>
           </ul>
@@ -155,7 +155,7 @@ export default function PrivacidadePage() {
 
         <Section id="cookies" title="8. Cookies">
           <p>
-            Usamos apenas o cookie essencial de sessão (login) — necessário para você continuar
+            Usamos apenas o cookie essencial de sessão (login) - necessário para você continuar
             autenticado durante o uso do aplicativo. Não usamos cookies de publicidade, rastreamento
             de terceiros ou analytics de comportamento.
           </p>
@@ -214,7 +214,7 @@ export default function PrivacidadePage() {
       <p className="mt-10 rounded-md border border-border bg-surface/70 p-4 text-xs leading-relaxed text-fg-muted">
         Este documento foi elaborado com base nos dados realmente tratados por este aplicativo e
         nos requisitos da LGPD (Lei nº 13.709/2018), mas não substitui a revisão de um advogado
-        antes da publicação definitiva — recomendação válida para qualquer política de privacidade,
+        antes da publicação definitiva - recomendação válida para qualquer política de privacidade,
         independentemente de quem a redige.
       </p>
     </main>
