@@ -39,8 +39,8 @@ function isValidSignature(rawBody: string, signatureHeader: string | null): bool
   const secret = process.env.META_APP_SECRET;
   if (!secret || !signatureHeader) return false;
   const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-  const a = Buffer.from(signatureHeader);
-  const b = Buffer.from(expected);
+  const a = Uint8Array.from(Buffer.from(signatureHeader));
+  const b = Uint8Array.from(Buffer.from(expected));
   if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
 }
