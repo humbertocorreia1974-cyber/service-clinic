@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getErrorMessage, getErrorStack } from '@/lib/error-info';
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    if (!["tecnico", "admin", "gerente"].includes(session.user.role)) {
+    if (!["tecnico", "admin", "gerente"].includes(session.user.role ?? "")) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
 
@@ -79,8 +80,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
       await reportRuntimeError({
         type: "server",
         file: "app/api/service-orders/[id]/charge/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch {
       /* relatar erro nunca pode gerar outro erro */
