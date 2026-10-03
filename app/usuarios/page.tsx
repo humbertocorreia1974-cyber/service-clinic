@@ -25,7 +25,7 @@ export default async function UsuariosPage() {
       </Link>
       <h1 className="mt-2 mb-6 font-display text-2xl font-bold text-fg">Usuários</h1>
       <UsuariosClient
-        currentUserId={session.user.id}
+        currentUserId={session.user.id ?? ""}
         initialUsers={users.map((u) => ({
           id: u.id,
           name: u.name,
