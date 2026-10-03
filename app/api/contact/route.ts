@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getErrorMessage, getErrorStack } from "@/lib/error-info";
 
 export const dynamic = "force-dynamic";
 
@@ -19,9 +20,15 @@ export async function POST(request: Request) {
     if (!email || typeof email !== "string" || email.length > 200) {
       return NextResponse.json({ error: "Email é obrigatório." }, { status: 400 });
     }
-    // @ts-ignore - o model Lead vem do schema gerado pelo Architect/Developer
     await prisma.lead.create({
-      data: { name: String(name ?? "").slice(0, 200), email, message: String(message ?? "").slice(0, 4000) },
+      data: {
+        name: String(name ?? "").slice(0, 200),
+        email,
+        message: String(message ?? "").slice(0, 4000),
+        phone: "",
+        city: "",
+        source: "contact_generico",
+      },
     });
     return NextResponse.json({ ok: true });
   } catch (err) {
@@ -36,8 +43,8 @@ export async function POST(request: Request) {
       await reportRuntimeError({
         type: 'server',
         file: "app/api/contact/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch (__jgnextApiErrorReportReportErr) { /* relatar erro nunca pode gerar outro erro */ }
     throw __jgnextApiErrorReportErr;
