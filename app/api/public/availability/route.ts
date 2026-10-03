@@ -5,6 +5,7 @@
 // texto livre de sempre — nunca finge ter horario que nao foi calculado).
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getErrorMessage, getErrorStack } from '@/lib/error-info';
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,7 @@ function overlaps(aStart: number, aEnd: number, bStart: number, bEnd: number) {
 }
 
 export async function GET(request: Request) {
+  try {
   try {
     const { searchParams } = new URL(request.url);
     const city = (searchParams.get("city") || "").trim();
@@ -122,5 +124,19 @@ export async function GET(request: Request) {
   } catch (err) {
     console.error("[GET /api/public/availability]", err);
     return NextResponse.json({ city: "", days: [] });
+  }
+
+  } catch (__jgnextApiErrorReportErr) {
+    // __jgnextApiErrorReport — reparo automático de runtime (ver runtimeErrorGate.js)
+    try {
+      const { reportRuntimeError } = await import('@/lib/runtime-error-reporter');
+      await reportRuntimeError({
+        type: 'server',
+        file: "app/api/public/availability/route.ts",
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
+      });
+    } catch (__jgnextApiErrorReportReportErr) { /* relatar erro nunca pode gerar outro erro */ }
+    throw __jgnextApiErrorReportErr;
   }
 }
