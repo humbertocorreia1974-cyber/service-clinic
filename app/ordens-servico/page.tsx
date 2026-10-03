@@ -22,7 +22,7 @@ export default async function OrdensServicoListPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login?next=/ordens-servico");
 
-  const role = session.user.role;
+  const role = session.user.role ?? "";
   const where =
     role === "tecnico"
       ? { assignedToId: session.user.id }
