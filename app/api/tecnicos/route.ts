@@ -35,7 +35,6 @@ export async function POST(request: Request) {
       .split(",")
       .map((s: string) => s.trim())
       .filter(Boolean);
-    const criarAcesso = Boolean(body?.criarAcesso);
 
     if (!name || !email || !phone || !cities.length) {
       return NextResponse.json(
@@ -44,48 +43,36 @@ export async function POST(request: Request) {
       );
     }
 
-    let generatedPassword: string | null = null;
-    let userId: string | undefined;
-
-    if (criarAcesso) {
-      const existingUser = await prisma.user.findUnique({ where: { email } });
-      if (existingUser) {
-        return NextResponse.json(
-          { error: "Já existe um usuário cadastrado com este e-mail." },
-          { status: 409 }
-        );
-      }
-      generatedPassword = randomPassword();
-      const passwordHash = await bcrypt.hash(generatedPassword, 10);
-      const user = await prisma.user.create({
-        data: { email, name, passwordHash, role: "tecnico" },
-        select: { id: true },
-      });
-      userId = user.id;
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "Já existe um usuário cadastrado com este e-mail." },
+        { status: 409 }
+      );
     }
 
-    // Dois branches em vez de spread condicional (`...(userId ? {userId} : {})`):
-    // o tipo de create do Prisma é uma união exclusiva (com ou sem userId), e o
-    // TypeScript não consegue provar que um spread condicional respeita essa
-    // união — precisa de duas chamadas literais, uma por branch, pra tipar certo.
-    const technician = userId
-      ? await prisma.technician.create({
-          data: { name, email, phone, cities, specialties, userId },
-        })
-      : await prisma.technician.create({
-          data: { name, email, phone, cities, specialties },
-        });
+    // Technician.userId é obrigatório no schema (relação 1:1 com User) — todo
+    // técnico PRECISA de uma conta de login, não é uma opção. A tela já não
+    // oferece mais a escolha de "criar sem acesso" por isso.
+    const generatedPassword = randomPassword();
+    const passwordHash = await bcrypt.hash(generatedPassword, 10);
+    const user = await prisma.user.create({
+      data: { email, name, passwordHash, role: "tecnico" },
+      select: { id: true },
+    });
 
-    if (criarAcesso && generatedPassword) {
-      try {
-        await sendEmail({
-          to: email,
-          subject: "Acesso ao app de técnicos — Service Clinic",
-          html: `<p>Olá, ${escapeHtml(name)}!</p><p>Seu acesso foi criado.</p><p>Login: ${escapeHtml(email)}<br/>Senha provisória: <strong>${escapeHtml(generatedPassword)}</strong></p><p>Recomendamos trocar a senha assim que possível.</p>`,
-        });
-      } catch {
-        // falha de e-mail nao bloqueia a criacao do tecnico
-      }
+    const technician = await prisma.technician.create({
+      data: { name, email, phone, cities, specialties, userId: user.id },
+    });
+
+    try {
+      await sendEmail({
+        to: email,
+        subject: "Acesso ao app de técnicos — Service Clinic",
+        html: `<p>Olá, ${escapeHtml(name)}!</p><p>Seu acesso foi criado.</p><p>Login: ${escapeHtml(email)}<br/>Senha provisória: <strong>${escapeHtml(generatedPassword)}</strong></p><p>Recomendamos trocar a senha assim que possível.</p>`,
+      });
+    } catch {
+      // falha de e-mail nao bloqueia a criacao do tecnico
     }
 
     return NextResponse.json({ technician, temporaryPassword: generatedPassword }, { status: 201 });
