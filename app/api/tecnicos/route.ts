@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import { escapeHtml } from "@/lib/escape-html";
+import { getErrorMessage, getErrorStack } from "@/lib/error-info";
 
 export const dynamic = "force-dynamic";
 
@@ -63,9 +64,17 @@ export async function POST(request: Request) {
       userId = user.id;
     }
 
-    const technician = await prisma.technician.create({
-      data: { name, email, phone, cities, specialties, ...(userId ? { userId } : {}) },
-    });
+    // Dois branches em vez de spread condicional (`...(userId ? {userId} : {})`):
+    // o tipo de create do Prisma é uma união exclusiva (com ou sem userId), e o
+    // TypeScript não consegue provar que um spread condicional respeita essa
+    // união — precisa de duas chamadas literais, uma por branch, pra tipar certo.
+    const technician = userId
+      ? await prisma.technician.create({
+          data: { name, email, phone, cities, specialties, userId },
+        })
+      : await prisma.technician.create({
+          data: { name, email, phone, cities, specialties },
+        });
 
     if (criarAcesso && generatedPassword) {
       try {
@@ -86,8 +95,8 @@ export async function POST(request: Request) {
       await reportRuntimeError({
         type: "server",
         file: "app/api/tecnicos/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch {
       /* relatar erro nunca pode gerar outro erro */
