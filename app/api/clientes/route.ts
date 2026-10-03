@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { getErrorMessage, getErrorStack } from '@/lib/error-info';
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
     if (!session?.user) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
-    if (!["admin", "gerente"].includes(session.user.role)) {
+    if (!["admin", "gerente"].includes(session.user.role ?? "")) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
 
@@ -97,8 +98,8 @@ export async function POST(request: Request) {
       await reportRuntimeError({
         type: "server",
         file: "app/api/clientes/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch {
       /* relatar erro nunca pode gerar outro erro */
@@ -111,7 +112,7 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user || !["admin", "gerente"].includes(session.user.role)) {
+    if (!session?.user || !["admin", "gerente"].includes(session.user.role ?? "")) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
     const clients = await prisma.client.findMany({ orderBy: { createdAt: "desc" } });
