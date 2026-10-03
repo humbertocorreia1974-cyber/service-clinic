@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { PortalServiceOrderCard } from "./service-order-card";
+import { buildPixPayload, getPixConfig } from "@/lib/pix";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Portal do cliente · Service Clinic" };
@@ -26,6 +27,8 @@ export default async function PortalPage() {
     take: 30,
   });
 
+  const pixConfig = getPixConfig();
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="font-display text-2xl font-bold text-fg">Olá, {client.nomeFantasia}</h1>
@@ -39,6 +42,22 @@ export default async function PortalPage() {
         ) : (
           orders.map((os) => {
             const pendingInvoiceItem = os.invoiceItems.find((i) => i.invoice.status === "pendente");
+            const pendingInvoiceTotal = pendingInvoiceItem ? Number(pendingInvoiceItem.invoice.total) : null;
+
+            // O payload Pix inclui o valor, então é gerado aqui (server-side)
+            // por cobrança, não globalmente — cada OS com cobrança pendente
+            // ganha seu próprio QR Code já com o valor certo preenchido.
+            const pixPayload =
+              pixConfig && pendingInvoiceTotal
+                ? buildPixPayload({
+                    key: pixConfig.key,
+                    merchantName: pixConfig.merchantName,
+                    merchantCity: pixConfig.merchantCity,
+                    amount: pendingInvoiceTotal,
+                    txid: os.code,
+                  })
+                : null;
+
             return (
               <PortalServiceOrderCard
                 key={os.id}
@@ -51,7 +70,8 @@ export default async function PortalPage() {
                 totalValue={os.totalValue ? Number(os.totalValue) : null}
                 clientApprovedAt={os.clientApprovedAt ? os.clientApprovedAt.toISOString() : null}
                 review={os.review ? { rating: os.review.rating, comment: os.review.comment } : null}
-                pendingInvoiceTotal={pendingInvoiceItem ? Number(pendingInvoiceItem.invoice.total) : null}
+                pendingInvoiceTotal={pendingInvoiceTotal}
+                pixPayload={pixPayload}
               />
             );
           })
