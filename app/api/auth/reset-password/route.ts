@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { decodeTokenEmail, verifyResetToken } from '@/lib/reset-token';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { getErrorMessage, getErrorStack } from '@/lib/error-info';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,8 +45,8 @@ export async function POST(request: Request) {
       await reportRuntimeError({
         type: 'server',
         file: "app/api/auth/reset-password/route.ts",
-        message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-        stack: __jgnextApiErrorReportErr?.stack,
+        message: getErrorMessage(__jgnextApiErrorReportErr),
+        stack: getErrorStack(__jgnextApiErrorReportErr),
       });
     } catch (__jgnextApiErrorReportReportErr) { /* relatar erro nunca pode gerar outro erro */ }
     throw __jgnextApiErrorReportErr;
