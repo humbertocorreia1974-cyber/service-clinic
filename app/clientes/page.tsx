@@ -12,7 +12,7 @@ export const metadata = { title: "Clientes · Service Clinic" };
 export default async function ClientesPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login?next=/clientes");
-  if (!["admin", "gerente"].includes(session.user.role)) redirect("/dashboard");
+  if (!["admin", "gerente"].includes(session.user.role ?? "")) redirect("/dashboard");
 
   const clients = await prisma.client.findMany({ orderBy: { createdAt: "desc" } });
 
