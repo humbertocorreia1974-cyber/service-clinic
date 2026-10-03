@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { escapeHtml } from "@/lib/escape-html";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
     if (!session?.user) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
-    if (!["admin", "gerente"].includes(session.user.role)) {
+    if (!["admin", "gerente"].includes(session.user.role ?? "")) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
 
@@ -63,7 +64,7 @@ export async function POST(request: Request) {
     }
 
     const technician = await prisma.technician.create({
-      data: { name, email, phone, cities, specialties, userId },
+      data: { name, email, phone, cities, specialties, ...(userId ? { userId } : {}) },
     });
 
     if (criarAcesso && generatedPassword) {
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
         await sendEmail({
           to: email,
           subject: "Acesso ao app de técnicos — Service Clinic",
-          html: `<p>Olá, ${name}!</p><p>Seu acesso foi criado.</p><p>Login: ${email}<br/>Senha provisória: <strong>${generatedPassword}</strong></p><p>Recomendamos trocar a senha assim que possível.</p>`,
+          html: `<p>Olá, ${escapeHtml(name)}!</p><p>Seu acesso foi criado.</p><p>Login: ${escapeHtml(email)}<br/>Senha provisória: <strong>${escapeHtml(generatedPassword)}</strong></p><p>Recomendamos trocar a senha assim que possível.</p>`,
         });
       } catch {
         // falha de e-mail nao bloqueia a criacao do tecnico
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user || !["admin", "gerente"].includes(session.user.role)) {
+    if (!session?.user || !["admin", "gerente"].includes(session.user.role ?? "")) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
     const technicians = await prisma.technician.findMany({ orderBy: { createdAt: "desc" } });
