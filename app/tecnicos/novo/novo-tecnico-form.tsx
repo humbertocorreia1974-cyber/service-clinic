@@ -10,7 +10,6 @@ export function NovoTecnicoForm({ cidades }: { cidades: string[] }) {
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [erro, setErro] = useState<string | null>(null);
   const [senhaGerada, setSenhaGerada] = useState<string | null>(null);
-  const [criarAcesso, setCriarAcesso] = useState(true);
   const [cidadesSelecionadas, setCidadesSelecionadas] = useState<string[]>([]);
 
   function toggleCidade(c: string) {
@@ -31,7 +30,6 @@ export function NovoTecnicoForm({ cidades }: { cidades: string[] }) {
       phone: String(fd.get("phone") ?? "").trim(),
       specialties: String(fd.get("specialties") ?? "").trim(),
       cities: cidadesSelecionadas,
-      criarAcesso,
     };
 
     if (!cidadesSelecionadas.length) {
@@ -107,6 +105,9 @@ export function NovoTecnicoForm({ cidades }: { cidades: string[] }) {
           E-mail *
         </label>
         <Input id="email" name="email" type="email" required placeholder="tecnico@serviceclinic.com.br" />
+        <p className="mt-1 text-xs text-fg-muted">
+          Esse e-mail vira o login do técnico no app — a senha provisória é gerada automaticamente.
+        </p>
       </div>
 
       <div>
@@ -132,16 +133,6 @@ export function NovoTecnicoForm({ cidades }: { cidades: string[] }) {
           ))}
         </div>
       </div>
-
-      <label className="flex items-center gap-2 text-sm text-fg">
-        <input
-          type="checkbox"
-          checked={criarAcesso}
-          onChange={(e) => setCriarAcesso(e.target.checked)}
-          className="h-4 w-4 rounded border-border"
-        />
-        Criar acesso ao app do técnico com este e-mail
-      </label>
 
       {status === "error" && erro && (
         <p className="rounded-md border border-border bg-surface px-3 py-2 text-sm text-accent">{erro}</p>
