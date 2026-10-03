@@ -12,7 +12,7 @@ export const metadata = { title: "Técnicos · Service Clinic" };
 export default async function TecnicosPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login?next=/tecnicos");
-  if (!["admin", "gerente"].includes(session.user.role)) redirect("/dashboard");
+  if (!["admin", "gerente"].includes(session.user.role ?? "")) redirect("/dashboard");
 
   const technicians = await prisma.technician.findMany({ orderBy: { createdAt: "desc" } });
 
