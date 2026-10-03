@@ -79,14 +79,14 @@ export default function TermosPage() {
 
         <Section id="contas" title="2. Contas e acesso">
           <p>
-            O acesso a este aplicativo é por convite — contas são criadas pela administração da
+            O acesso a este aplicativo é por convite - contas são criadas pela administração da
             Service Clinic ou, no caso de clientes e técnicos, provisionadas automaticamente no
             cadastro vinculado (nova clínica ou novo técnico).
           </p>
           <ul className="list-disc space-y-1.5 pl-5">
             <li>Você é responsável por manter sua senha em sigilo e por tudo o que acontecer na sua conta.</li>
             <li>Avise-nos imediatamente se suspeitar de acesso não autorizado à sua conta.</li>
-            <li>Cada conta é de uso individual — não compartilhe credenciais entre pessoas diferentes.</li>
+            <li>Cada conta é de uso individual - não compartilhe credenciais entre pessoas diferentes.</li>
           </ul>
         </Section>
 
@@ -104,7 +104,7 @@ export default function TermosPage() {
           <p>
             Fotos de evidência, checklist técnico, assinatura de aprovação e avaliações enviadas por
             você permanecem vinculadas à ordem de serviço correspondente e são usadas apenas para
-            documentar o atendimento prestado — conforme descrito na{' '}
+            documentar o atendimento prestado - conforme descrito na{' '}
             <a href="/privacidade" className="text-brand hover:underline">Política de Privacidade</a>.
           </p>
           <p>Você garante que tem o direito de enviar o conteúdo que anexa (ex.: fotos do próprio equipamento/ambiente).</p>
@@ -122,7 +122,7 @@ export default function TermosPage() {
         <Section id="disponibilidade" title="6. Disponibilidade do serviço">
           <p>
             Fazemos o possível para manter o aplicativo disponível, mas não garantimos operação
-            ininterrupta — pode haver manutenções programadas ou instabilidades pontuais de
+            ininterrupta - pode haver manutenções programadas ou instabilidades pontuais de
             infraestrutura (hospedagem, banco de dados) fora do nosso controle direto. Em caso de
             indisponibilidade, o atendimento técnico presencial segue sendo coordenado pelos canais
             diretos (WhatsApp/telefone).
@@ -139,7 +139,7 @@ export default function TermosPage() {
 
         <Section id="responsabilidade" title="8. Limitação de responsabilidade">
           <p>
-            Este aplicativo é uma ferramenta de gestão e comunicação do atendimento — não substitui o
+            Este aplicativo é uma ferramenta de gestão e comunicação do atendimento - não substitui o
             julgamento técnico profissional do técnico responsável nem garante, por si só, o
             funcionamento do equipamento atendido além do que foi tecnicamente executado e descrito
             na ordem de serviço.
@@ -193,7 +193,7 @@ export default function TermosPage() {
       <p className="mt-10 rounded-md border border-border bg-surface/70 p-4 text-xs leading-relaxed text-fg-muted">
         Este documento foi elaborado com base nas práticas reais deste aplicativo e em cláusulas
         padrão do mercado para serviços B2B de field service, mas não substitui a revisão de um
-        advogado antes da publicação definitiva — recomendação válida para qualquer termo de uso,
+        advogado antes da publicação definitiva - recomendação válida para qualquer termo de uso,
         independentemente de quem o redige.
       </p>
     </main>
