@@ -13,7 +13,7 @@ const CIDADES = ["Volta Redonda", "Pinheiral", "Barra Mansa", "Resende", "Barra 
 export default async function NovoClientePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/login?next=/clientes/novo");
-  if (!["admin", "gerente"].includes(session.user.role)) redirect("/dashboard");
+  if (!["admin", "gerente"].includes(session.user.role ?? "")) redirect("/dashboard");
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
