@@ -37,11 +37,19 @@ const nextConfig = {
     ] }];
   },
   reactStrictMode: true,
-  // App gerado: a fundação é type-safe, mas o código de feature escrito pela
-  // IA nem sempre passa no type-check strict (ex. `catch (error)` -> error is
-  // unknown). O app roda igual; não travamos o deploy por isso. Mesma escolha
-  // de Lovable/Bolt. Erros reais (sintaxe, módulo faltando) ainda quebram.
-  typescript: { ignoreBuildErrors: true },
+  // 2026-10-03 (auditoria, item concluído): type-check estrito LIGADO de
+  // verdade — os 94 erros reais que existiam (catch(error) sem tipo, role
+  // opcional sem tratar, 2 bugs reais de forma do Prisma) foram corrigidos
+  // um por um e verificados com `tsc --noEmit` numa instalação limpa (0
+  // erros). Não é mais "não travamos o deploy por isso" — agora trava, e
+  // deveria: é a rede de segurança que faltava.
+  typescript: { ignoreBuildErrors: false },
+  // ESLint permanece ignorado no build porque este projeto nunca teve uma
+  // configuração de lint instalada (sem eslint-config-next, sem .eslintrc) —
+  // ligar a flag sem isso não reforça nenhuma regra real e arrisca travar o
+  // build num prompt interativo de setup. Ligar de verdade exigiria primeiro
+  // instalar e configurar o ESLint, o que é um projeto à parte, não uma
+  // continuação deste.
   eslint: { ignoreDuringBuilds: true },
   ...(sandboxBasePath ? { basePath: sandboxBasePath } : {}),
 };
