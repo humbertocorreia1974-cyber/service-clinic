@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PixQrCode } from "@/components/pix-qrcode";
 
 const TYPE_LABEL: Record<string, string> = {
   preventiva: "Preventiva",
@@ -31,6 +32,7 @@ export function PortalServiceOrderCard({
   clientApprovedAt,
   review,
   pendingInvoiceTotal,
+  pixPayload,
 }: {
   id: string;
   code: string;
@@ -42,6 +44,7 @@ export function PortalServiceOrderCard({
   clientApprovedAt: string | null;
   review: { rating: number; comment: string | null } | null;
   pendingInvoiceTotal: number | null;
+  pixPayload: string | null;
 }) {
   const router = useRouter();
   const [aprovando, setAprovando] = useState(false);
@@ -113,9 +116,13 @@ export function PortalServiceOrderCard({
       {pendingInvoiceTotal ? (
         <div className="mt-3 rounded-md border border-border bg-bg/60 p-3 text-sm text-fg">
           Cobrança enviada: <strong>R$ {pendingInvoiceTotal.toFixed(2)}</strong>
-          <p className="mt-1 text-xs text-fg-muted">
-            Pague via PIX, cartão ou dinheiro diretamente com nossa equipe — a confirmação do recebimento é feita manualmente.
-          </p>
+          {pixPayload ? (
+            <PixQrCode payload={pixPayload} amountLabel={`R$ ${pendingInvoiceTotal.toFixed(2)}`} />
+          ) : (
+            <p className="mt-1 text-xs text-fg-muted">
+              Pague via PIX, cartão ou dinheiro diretamente com nossa equipe — a confirmação do recebimento é feita manualmente.
+            </p>
+          )}
         </div>
       ) : null}
 
