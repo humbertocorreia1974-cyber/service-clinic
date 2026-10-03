@@ -3,22 +3,10 @@ import { getServerSession } from "next-auth";
 import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { STAFF_ROLES } from "@/lib/staff-roles";
+import { getErrorMessage, getErrorStack } from "@/lib/error-info";
 
 export const dynamic = "force-dynamic";
-
-// roles de equipe interna — cliente e tecnico tem fluxo proprio (/clientes/novo,
-// /tecnicos/novo) que cria o registro vinculado (Client/Technician); criar aqui
-// sem esse vinculo quebraria o portal/aba do tecnico.
-export const STAFF_ROLES = [
-    "admin",
-    "gerente",
-    "atendente",
-    "comercial",
-    "vendas",
-    "compras",
-    "financeiro",
-    "engenheiro",
-];
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -98,8 +86,8 @@ export async function POST(request: Request) {
             await reportRuntimeError({
                 type: "server",
                 file: "app/api/usuarios/route.ts",
-                message: __jgnextApiErrorReportErr?.message || String(__jgnextApiErrorReportErr),
-                stack: __jgnextApiErrorReportErr?.stack,
+                message: getErrorMessage(__jgnextApiErrorReportErr),
+                stack: getErrorStack(__jgnextApiErrorReportErr),
             });
         } catch {
             /* relatar erro nunca pode gerar outro erro */
