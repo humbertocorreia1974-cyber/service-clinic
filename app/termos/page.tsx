@@ -189,13 +189,6 @@ export default function TermosPage() {
           </p>
         </Section>
       </div>
-
-      <p className="mt-10 rounded-md border border-border bg-surface/70 p-4 text-xs leading-relaxed text-fg-muted">
-        Este documento foi elaborado com base nas práticas reais deste aplicativo e em cláusulas
-        padrão do mercado para serviços B2B de field service, mas não substitui a revisão de um
-        advogado antes da publicação definitiva - recomendação válida para qualquer termo de uso,
-        independentemente de quem o redige.
-      </p>
     </main>
   );
 }
