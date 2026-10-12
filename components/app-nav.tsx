@@ -2,14 +2,19 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 const LINKS = [{"href":"/servicos","label":"Servicos"},{"href":"/area-atendida","label":"Area Atendida"},{"href":"/pecas","label":"Pecas"},{"href":"/blog","label":"Blog"}];
 const HIDE = [/^\/$/, /^\/login/, /^\/register/, /^\/redefinir-senha/, /^\/esqueci-senha/, /^\/recuperar/, /^\/termos/, /^\/privacidade/, /^\/cookies/, /^\/verificar/];
 
 export function AppNav() {
   const pathname = usePathname() || '/';
-  if (HIDE.some((re) => re.test(pathname))) return null;
+  const { status } = useSession();
+  // 2026-10-09 (auditoria de lançamento): HIDE por rota não cobre páginas
+  // públicas de marketing (ex: /servicos, /contato, /sobre) - visitante
+  // anônimo via essas rotas via menu autenticado com 'Sair'. Checar a
+  // SESSÃO de verdade, não a rota, fecha a lacuna pra qualquer página.
+  if (HIDE.some((re) => re.test(pathname)) || status !== 'authenticated') return null;
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur">
       <nav className="mx-auto flex h-20 max-w-6xl items-center gap-1 overflow-x-auto px-4">
