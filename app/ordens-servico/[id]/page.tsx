@@ -9,6 +9,7 @@ import { StatusBadge } from "./status-badge";
 import { ChecklistClient } from "./checklist-client";
 import { AssignClient } from "./assign-client";
 import { SignatureClient } from "./signature-client";
+import { PhotosUploadClient } from "./photos-upload-client";
 
 export const dynamic = "force-dynamic";
 
@@ -140,6 +141,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                   ))}
                 </div>
               )}
+              {canEdit && <PhotosUploadClient serviceOrderId={os.id} />}
             </CardBody>
           </Card>
 
