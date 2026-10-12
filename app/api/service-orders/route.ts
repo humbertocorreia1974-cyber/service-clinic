@@ -8,6 +8,38 @@ export const dynamic = "force-dynamic";
 
 const VALID_TYPES = ["preventiva", "corretiva", "higienizacao_ac", "instalacao", "venda_peca"];
 
+// 2026-10-09 (auditoria de lançamento): template padrão de checklist por
+// tipo de OS - sem isso, toda OS nascia sem nenhum item (ver mensagem do
+// commit). Itens genéricos o bastante pra servir de ponto de partida real;
+// o técnico pode precisar de item extra em algum caso, mas pelo menos não
+// começa de uma lista vazia.
+const CHECKLIST_TEMPLATES: Record<string, { key: string; label: string; group: string }[]> = {
+  preventiva: [
+    { key: "limpeza_geral", label: "Limpeza geral do equipamento", group: "biosseguranca" },
+    { key: "verificacao_eletrica", label: "Verificação de fiação e conexões elétricas", group: "eletrica" },
+    { key: "lubrificacao", label: "Lubrificação de partes móveis", group: "mecanica" },
+    { key: "teste_funcionamento", label: "Teste de funcionamento completo", group: "mecanica" },
+  ],
+  corretiva: [
+    { key: "diagnostico", label: "Diagnóstico do defeito relatado", group: "mecanica" },
+    { key: "peca_substituida", label: "Registro de peça(s) substituída(s)", group: "mecanica" },
+    { key: "teste_pos_reparo", label: "Teste de funcionamento pós-reparo", group: "mecanica" },
+  ],
+  higienizacao_ac: [
+    { key: "limpeza_filtros", label: "Limpeza de filtros", group: "biosseguranca" },
+    { key: "higienizacao_serpentina", label: "Higienização de serpentina/dreno", group: "biosseguranca" },
+    { key: "verificacao_gas", label: "Verificação de carga de gás refrigerante", group: "eletrica" },
+  ],
+  instalacao: [
+    { key: "verificacao_local", label: "Verificação das condições do local de instalação", group: "eletrica" },
+    { key: "instalacao_fisica", label: "Instalação física do equipamento", group: "mecanica" },
+    { key: "teste_inicial", label: "Teste de funcionamento inicial", group: "mecanica" },
+  ],
+  venda_peca: [
+    { key: "conferencia_peca", label: "Conferência da peça entregue", group: "mecanica" },
+  ],
+};
+
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -78,6 +110,19 @@ export async function POST(request: Request) {
         totalValue,
       },
     });
+
+    const template = CHECKLIST_TEMPLATES[type] ?? [];
+    if (template.length > 0) {
+      await prisma.serviceOrderChecklist.createMany({
+        data: template.map((item, i) => ({
+          serviceOrderId: os.id,
+          itemKey: item.key,
+          itemLabel: item.label,
+          itemGroup: item.group,
+          order: i,
+        })),
+      });
+    }
 
     if (assignedToId) {
       await prisma.notification.create({
