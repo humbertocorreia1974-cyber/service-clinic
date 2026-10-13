@@ -22,6 +22,12 @@
 // borda. Logo menor + "Serviços"/"Agenda" (scroll-anchor redundante com o
 // resto da página) escondidos abaixo de sm; "Entrar" e o CTA real continuam
 // sempre visíveis.
+//
+// 🩹 2026-10-13 (2ª rodada, mesmo dia — feedback real): o fix acima encolheu
+// demais o logo (h-10/40px) pra abrir espaço. Rebalanceado: logo sobe pra
+// h-11/44px (mais perto do tamanho de marca original), e quem cede espaço
+// agora é o texto do CTA (abrevia pra "Orçamento" só no mobile) em vez da
+// logo. "Entrar" continua sempre por extenso.
 import Link from "next/link";
 import Image from "next/image";
 import * as Icons from "lucide-react";
@@ -93,16 +99,21 @@ export default function Home() {
   return (
     <div className="relative">
       <header className="sticky top-0 z-40 border-b border-border/60 bg-bg/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:px-6 sm:py-5">
-          <span className="flex min-w-0 items-center gap-2 text-base font-bold tracking-tight sm:gap-3 sm:text-2xl">
-            <img src="/logo.svg" alt={l.name} className="h-10 w-10 shrink-0 rounded-xl shadow-lg shadow-brand/20 sm:h-16 sm:w-16" />
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-5">
+          <span className="flex min-w-0 flex-1 items-center gap-2 text-base font-bold tracking-tight sm:flex-none sm:gap-3 sm:text-2xl">
+            <img src="/logo.svg" alt={l.name} className="h-11 w-11 shrink-0 rounded-xl shadow-lg shadow-brand/20 sm:h-16 sm:w-16" />
             <span className="truncate">{l.name}</span>
           </span>
           <nav className="flex shrink-0 items-center gap-1">
             <Link href="#pilares" className="hidden sm:inline-flex"><Button variant="ghost" size="sm">Serviços</Button></Link>
             {l.agenda?.length ? <Link href="#agenda" className="hidden sm:inline-flex"><Button variant="ghost" size="sm">Agenda</Button></Link> : null}
-            <Link href="/login"><Button variant="ghost" size="sm">Entrar</Button></Link>
-            <Link href={l.hero.ctaHref ?? "#contato"}><Button size="sm">{l.hero.cta || "Começar"}</Button></Link>
+            <Link href="/login"><Button variant="ghost" size="sm" className="px-2.5 sm:px-3">Entrar</Button></Link>
+            <Link href={l.hero.ctaHref ?? "#contato"}>
+              <Button size="sm" className="px-3 sm:px-4">
+                <span className="sm:hidden">Orçamento</span>
+                <span className="hidden sm:inline">{l.hero.cta || "Começar"}</span>
+              </Button>
+            </Link>
           </nav>
         </div>
       </header>
