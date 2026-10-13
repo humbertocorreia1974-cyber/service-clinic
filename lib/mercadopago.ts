@@ -50,6 +50,55 @@ export async function createPreference({
   return { id: data.id as string, initPoint: data.init_point as string };
 }
 
+// 2026-10-13: loja de pecas - pedido pode ter VARIOS itens (carrinho real),
+// diferente da fatura de OS (sempre 1 linha). Funcao separada pra nao mexer
+// no fluxo de fatura que ja funciona; usa o mesmo external_reference +
+// notification_url, so o webhook (/api/mercadopago/webhook) que decide se
+// o id é de uma Invoice ou de um PartOrder.
+export type CartPreferenceItem = { title: string; quantity: number; unitPrice: number };
+export type CreateCartPreferenceInput = {
+  orderId: string;
+  items: CartPreferenceItem[];
+  payerEmail: string;
+  baseUrl: string;
+};
+
+export async function createCartPreference({
+  orderId,
+  items,
+  payerEmail,
+  baseUrl,
+}: CreateCartPreferenceInput): Promise<{ id: string; initPoint: string }> {
+  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  if (!token) throw new Error('Mercado Pago não configurado.');
+
+  const res = await fetch(`${MP_API}/checkout/preferences`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      items: items.map((i) => ({
+        title: i.title,
+        quantity: i.quantity,
+        unit_price: i.unitPrice,
+        currency_id: 'BRL',
+      })),
+      payer: { email: payerEmail },
+      external_reference: orderId,
+      back_urls: {
+        success: `${baseUrl}/pecas/pedido/${orderId}?pagamento=sucesso`,
+        pending: `${baseUrl}/pecas/pedido/${orderId}?pagamento=pendente`,
+        failure: `${baseUrl}/pecas/pedido/${orderId}?pagamento=falhou`,
+      },
+      auto_return: 'approved',
+      notification_url: `${baseUrl}/api/mercadopago/webhook`,
+    }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.message || 'Falha ao criar cobrança no Mercado Pago.');
+  return { id: data.id as string, initPoint: data.init_point as string };
+}
+
 export async function getPayment(paymentId: string): Promise<any> {
   const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
   if (!token) throw new Error('Mercado Pago não configurado.');
