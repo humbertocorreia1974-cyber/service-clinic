@@ -28,12 +28,25 @@
 // h-11/44px (mais perto do tamanho de marca original), e quem cede espaço
 // agora é o texto do CTA (abrevia pra "Orçamento" só no mobile) em vez da
 // logo. "Entrar" continua sempre por extenso.
+//
+// 🩹 2026-10-13 (3ª rodada, mesmo dia — diferenciação visual): Humberto notou
+// que este app e o TennisPlay "soam parecidos" e pediu mais criatividade. A
+// causa raiz é estrutural: ESTE arquivo é o skeleton partilhado por todo app
+// JGNEXT gerado como landing — só content/landing.ts muda. Em vez de mexer no
+// molde compartilhado (risco pra todo app futuro), esta cópia própria do
+// Service Clinic (este arquivo, só deste repo) ganhou uma identidade visual
+// amarrada ao negócio real: motivo "OS" (ordem de serviço) — tags monospace
+// tracejadas "OS·0X" substituindo os círculos numerados genéricos nos pilares
+// e no "como funciona", e um chip de estatística real do catálogo (nunca dado
+// de cliente específico) no hero. O molde mestre em TEMPLATE_DIR não foi
+// tocado.
 import Link from "next/link";
 import Image from "next/image";
 import * as Icons from "lucide-react";
 import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { landing } from "@/content/landing";
+import { prisma } from "@/lib/prisma";
 import ContactForm from "./contact-form";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -75,7 +88,9 @@ const TRUST_CHIPS = [
   { icon: "Receipt", label: "Taxa de deslocamento sem surpresa" },
 ];
 
-export default function Home() {
+export const revalidate = 3600;
+
+export default async function Home() {
   const l: any = {
     name: L.name || "Produto",
     hero: L.hero || {},
@@ -96,6 +111,22 @@ export default function Home() {
     "Instrumental odontológico em manutenção",
     "Peças e instrumentos organizados para reposição",
   ];
+
+  // Selo "OS" (ordem de serviço) é a identidade real do negócio - estatística
+  // agregada do catálogo (nunca dado de cliente específico) reforça isso no
+  // hero sem depender de nenhum registro individual exibido publicamente.
+  let partsCount = 0;
+  let categoriesCount = 0;
+  try {
+    const [count, categoryRows] = await Promise.all([
+      prisma.part.count({ where: { active: true, publicVisible: true } }),
+      prisma.part.groupBy({ by: ["category"], where: { active: true, publicVisible: true } }),
+    ]);
+    partsCount = count;
+    categoriesCount = categoryRows.length;
+  } catch {
+    // catálogo indisponível não pode derrubar a landing
+  }
 
   return (
     <div className="relative">
@@ -150,6 +181,14 @@ export default function Home() {
               </div>
             ))}
           </div>
+          {partsCount > 0 ? (
+            <div className="mt-4 flex flex-wrap gap-3">
+              <span className="inline-flex items-center gap-2 rounded-lg border border-dashed border-brand/40 bg-brand/5 px-3 py-1.5 font-mono text-xs text-brand">
+                <Icon name="Package" className="h-3.5 w-3.5" />
+                {partsCount} peças catalogadas{categoriesCount ? ` · ${categoriesCount} categorias de equipamento` : ""}
+              </span>
+            </div>
+          ) : null}
         </div>
         <div className="relative">
           <div
@@ -194,8 +233,8 @@ export default function Home() {
                     className="object-cover"
                   />
                 </div>
-                <span className="absolute -left-3 -top-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-base font-bold text-accent-fg shadow-lg">
-                  {String(fi + 1).padStart(2, "0")}
+                <span className="absolute -left-3 -top-3 -rotate-3 rounded-lg border-2 border-dashed border-accent bg-bg px-3 py-1.5 font-mono text-xs font-bold text-accent shadow-lg">
+                  OS·{String(fi + 1).padStart(2, "0")}
                 </span>
               </div>
               <div>
@@ -260,11 +299,11 @@ export default function Home() {
             <span className="text-xs font-semibold uppercase tracking-widest text-accent">Como funciona</span>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight">Do primeiro contato ao registro final</h2>
             <div className="relative mt-14 grid gap-10 sm:grid-cols-4">
-              <div className="absolute left-0 right-0 top-6 hidden h-px bg-gradient-to-r from-transparent via-border to-transparent sm:block" aria-hidden />
+              <div className="absolute left-0 right-0 top-6 hidden border-t border-dashed border-border sm:block" aria-hidden />
               {l.steps.map((s: any, i: number) => (
                 <div key={s.title || i} className="relative">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-accent bg-bg text-lg font-bold text-accent">
-                    {i + 1}
+                  <div className="inline-flex h-12 items-center justify-center rounded-lg border-2 border-dashed border-accent bg-bg px-3 font-mono text-sm font-bold text-accent">
+                    OS·{String(i + 1).padStart(2, "0")}
                   </div>
                   <h3 className="mt-5 text-sm font-semibold text-fg">{s.title || s.name}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-fg-muted">{s.body || s.description || s.text}</p>
