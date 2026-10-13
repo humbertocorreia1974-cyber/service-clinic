@@ -12,6 +12,17 @@ export const dynamic = 'force-dynamic';
 // vazar hash de senha de todo mundo caso a chave seja ativada no futuro
 // pra alguma integração. Autenticação/usuário tem rota própria protegida
 // por sessão (next-auth) — não deve passar por aqui.
+//
+// 🩹 2026-10-13: "medical-record", "medical-record-access", "patient",
+// "vaccination", "controlled-medication", "consent", "invoice", "payment"
+// e "audit-log" TAMBÉM removidos (estavam expostos até agora, apesar do
+// comentário do TennisPlay dizer "mesmo padrão já aplicado aqui" - não
+// estava). São modelos REAIS no schema (confirmado, não é entrada morta)
+// e o acessor devolve o registro inteiro sem seleção de campo: prontuário
+// médico, medicação controlada e dado financeiro ficariam acessíveis por
+// dump completo no dia em que alguém configurar APP_API_KEYS pra alguma
+// integração. Mesmo padrão já aplicado no TennisPlay (guardian-consent/
+// payment/invoice).
 const RESOURCES: Record<string, string> = {
   "project": "project",
   "client": "client",
@@ -23,29 +34,20 @@ const RESOURCES: Record<string, string> = {
   "service-order-signature": "serviceOrderSignature",
   "contract": "contract",
   "visit": "visit",
-  "invoice": "invoice",
   "invoice-item": "invoiceItem",
-  "payment": "payment",
   "part": "part",
   "stock-movement": "stockMovement",
   "lead": "lead",
   "laudo": "laudo",
   "notification": "notification",
-  "audit-log": "auditLog",
-  "medical-record": "medicalRecord",
-  "medical-record-access": "medicalRecordAccess",
   "document": "document",
   "insurance-plan": "insurancePlan",
   "specialty": "specialty",
   "professional": "professional",
-  "patient": "patient",
   "appointment": "appointment",
-  "vaccination": "vaccination",
-  "controlled-medication": "controlledMedication",
   "blog-post": "blogPost",
   "service": "service",
   "city": "city",
-  "consent": "consent",
   "health-check": "healthCheck"
 };
 
