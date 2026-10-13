@@ -6,6 +6,8 @@ import { Card, CardBody } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Wrench, Package, Search, ArrowRight } from 'lucide-react';
+import { AddToCartButton } from './add-to-cart-button';
+import { CartIndicator } from './cart-indicator';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,18 +80,23 @@ export default async function CatalogoPecasPage({
           <div className="absolute inset-0 bg-gradient-to-b from-bg/30 via-bg/80 to-bg" />
         </div>
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-          <p className="mb-2 inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-3 py-1 text-xs text-fg-muted">
-            <Package className="h-3.5 w-3.5 text-accent" />
-            Catálogo público
-          </p>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-fg sm:text-4xl">
-            Peças de reposição para equipamentos odontológicos
-          </h1>
-          <p className="mt-3 max-w-2xl text-fg-muted">
-            Peças originais e compatíveis para cadeiras, autoclaves, compressores, raio-X e
-            fotopolimerizadores. Consulte disponibilidade e solicite orçamento — atendemos todo o Sul
-            Fluminense.
-          </p>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="mb-2 inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-3 py-1 text-xs text-fg-muted">
+                <Package className="h-3.5 w-3.5 text-accent" />
+                Catálogo público
+              </p>
+              <h1 className="font-display text-3xl font-bold tracking-tight text-fg sm:text-4xl">
+                Peças de reposição para equipamentos odontológicos
+              </h1>
+              <p className="mt-3 max-w-2xl text-fg-muted">
+                Peças originais e compatíveis para cadeiras, autoclaves, compressores, raio-X e
+                fotopolimerizadores. Compre direto pelo site ou solicite orçamento — atendemos todo o
+                Sul Fluminense.
+              </p>
+            </div>
+            <CartIndicator />
+          </div>
         </div>
       </header>
 
@@ -163,16 +170,26 @@ export default async function CatalogoPecasPage({
                         {formatBRL(p.salePrice)}
                       </p>
                     </div>
-                    <Link
-                      href={`/contato?peca=${encodeURIComponent(p.sku)}&assunto=${encodeURIComponent(
-                        'Orçamento de peça: ' + p.name,
-                      )}`}
-                    >
-                      <Button variant="secondary" size="sm">
-                        Orçamento
-                        <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                      </Button>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <AddToCartButton
+                        partId={p.id}
+                        sku={p.sku}
+                        name={p.name}
+                        unitPrice={Number(p.salePrice)}
+                        imageUrl={p.imageUrl}
+                        stockQty={p.stockQty}
+                      />
+                      <Link
+                        href={`/contato?peca=${encodeURIComponent(p.sku)}&assunto=${encodeURIComponent(
+                          'Orçamento de peça: ' + p.name,
+                        )}`}
+                      >
+                        <Button variant="secondary" size="sm">
+                          Orçamento
+                          <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </CardBody>
               </Card>
