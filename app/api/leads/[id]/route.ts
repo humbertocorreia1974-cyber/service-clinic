@@ -16,7 +16,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
 
     const body = await request.json().catch(() => null);
-    const data: Record<string, unknown> = {};
+    const data: { status?: string; notes?: string | null } = {};
     if (body?.status && VALID_STATUS.includes(body.status)) data.status = body.status;
     if (typeof body?.notes === "string") data.notes = body.notes.trim() || null;
 
@@ -32,7 +32,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         action: "update",
         entity: "Lead",
         entityId: lead.id,
-        metadata: data,
+        metadata: { ...data },
       },
     });
 
