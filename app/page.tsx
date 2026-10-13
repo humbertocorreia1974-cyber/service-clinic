@@ -15,6 +15,13 @@
 // 🩹 2026-10-02 (auditoria): fotos reais convertidas de <img> pra next/image
 // (otimização ligada em next.config.js) — ganho de performance real, sem mudar
 // nenhum layout visual.
+//
+// 🩹 2026-10-13 (achado visual real, viewport 390px): header nunca colapsava
+// em mobile — logo de 64px + 4 itens de nav em justify-between sempre
+// estourava a tela (scrollWidth 417 > clientWidth 390), cortando o CTA na
+// borda. Logo menor + "Serviços"/"Agenda" (scroll-anchor redundante com o
+// resto da página) escondidos abaixo de sm; "Entrar" e o CTA real continuam
+// sempre visíveis.
 import Link from "next/link";
 import Image from "next/image";
 import * as Icons from "lucide-react";
@@ -86,14 +93,14 @@ export default function Home() {
   return (
     <div className="relative">
       <header className="sticky top-0 z-40 border-b border-border/60 bg-bg/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <span className="flex items-center gap-3 text-2xl font-bold tracking-tight">
-            <img src="/logo.svg" alt={l.name} className="h-16 w-16 rounded-xl shadow-lg shadow-brand/20" />
-            {l.name}
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:px-6 sm:py-5">
+          <span className="flex min-w-0 items-center gap-2 text-base font-bold tracking-tight sm:gap-3 sm:text-2xl">
+            <img src="/logo.svg" alt={l.name} className="h-10 w-10 shrink-0 rounded-xl shadow-lg shadow-brand/20 sm:h-16 sm:w-16" />
+            <span className="truncate">{l.name}</span>
           </span>
-          <nav className="flex items-center gap-1">
-            <Link href="#pilares"><Button variant="ghost" size="sm">Serviços</Button></Link>
-            {l.agenda?.length ? <Link href="#agenda"><Button variant="ghost" size="sm">Agenda</Button></Link> : null}
+          <nav className="flex shrink-0 items-center gap-1">
+            <Link href="#pilares" className="hidden sm:inline-flex"><Button variant="ghost" size="sm">Serviços</Button></Link>
+            {l.agenda?.length ? <Link href="#agenda" className="hidden sm:inline-flex"><Button variant="ghost" size="sm">Agenda</Button></Link> : null}
             <Link href="/login"><Button variant="ghost" size="sm">Entrar</Button></Link>
             <Link href={l.hero.ctaHref ?? "#contato"}><Button size="sm">{l.hero.cta || "Começar"}</Button></Link>
           </nav>
