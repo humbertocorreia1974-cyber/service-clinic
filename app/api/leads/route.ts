@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import { escapeHtml } from "@/lib/escape-html";
@@ -14,6 +16,7 @@ const VALID_SOURCES = [
   "contato",
   "blog",
   "whatsapp",
+  "orcamento_foto",
 ];
 
 export async function POST(request: Request) {
@@ -31,6 +34,7 @@ export async function POST(request: Request) {
     const email = body?.email ? String(body.email).trim() : null;
     const subject = body?.subject ? String(body.subject).trim() : null;
     const message = body?.message ? String(body.message).trim() : null;
+    const photoUrl = body?.photoUrl ? String(body.photoUrl).trim() : null;
     const source = VALID_SOURCES.includes(body?.source)
       ? String(body.source)
       : "site_home";
@@ -61,6 +65,7 @@ export async function POST(request: Request) {
         email,
         subject,
         message,
+        photoUrl,
         source,
         status: "novo",
         preferredAt,
@@ -82,6 +87,7 @@ export async function POST(request: Request) {
           ${email ? `<p><strong>E-mail:</strong> ${escapeHtml(email)}</p>` : ""}
           ${subject ? `<p><strong>Assunto:</strong> ${escapeHtml(subject)}</p>` : ""}
           ${message ? `<p><strong>Mensagem:</strong><br/>${escapeHtml(message)}</p>` : ""}
+          ${photoUrl ? `<p><strong>Foto do problema:</strong><br/><img src="${escapeHtml(photoUrl)}" alt="Foto enviada pelo cliente" style="max-width:320px;border-radius:8px;" /></p>` : ""}
           <p><strong>Origem:</strong> ${escapeHtml(source)}</p>
           <p><a href="${process.env.NEXTAUTH_URL ?? ""}/leads">Ver no painel</a></p>
         `,
@@ -116,8 +122,17 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-  // Listagem pública desabilitada — use /api/leads autenticado no painel.
-  return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
+    const session = await getServerSession(authOptions);
+    if (!session?.user || !["admin", "gerente"].includes(session.user.role ?? "")) {
+      return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
+    }
+
+    const leads = await prisma.lead.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 200,
+    });
+
+    return NextResponse.json({ leads });
 
   } catch (__jgnextApiErrorReportErr) {
     // __jgnextApiErrorReport — reparo automático de runtime (ver runtimeErrorGate.js)
