@@ -1,14 +1,34 @@
 // Envio de e-mail transacional — provider-agnóstico, nunca quebra o app se
 // não estiver configurado (loga e segue). Ordem: Resend (se RESEND_API_KEY) →
 // SMTP via nodemailer (se SMTP_HOST) → console (dev).
-export async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
+type EmailAttachment = { filename: string; contentBase64: string };
+
+export async function sendEmail({
+  to,
+  subject,
+  html,
+  attachments,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+  attachments?: EmailAttachment[];
+}) {
   const from = process.env.EMAIL_FROM || 'no-reply@example.com';
   try {
     if (process.env.RESEND_API_KEY) {
       const r = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from, to, subject, html }),
+        body: JSON.stringify({
+          from,
+          to,
+          subject,
+          html,
+          ...(attachments?.length
+            ? { attachments: attachments.map((a) => ({ filename: a.filename, content: a.contentBase64 })) }
+            : {}),
+        }),
       });
       if (!r.ok) console.error('[email] Resend falhou:', await r.text());
       return;
@@ -22,10 +42,18 @@ export async function sendEmail({ to, subject, html }: { to: string; subject: st
         secure: process.env.SMTP_SECURE === 'true',
         auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
       });
-      await transporter.sendMail({ from, to, subject, html });
+      await transporter.sendMail({
+        from,
+        to,
+        subject,
+        html,
+        ...(attachments?.length
+          ? { attachments: attachments.map((a) => ({ filename: a.filename, content: Buffer.from(a.contentBase64, 'base64') })) }
+          : {}),
+      });
       return;
     }
-    console.log(`[email] (sem provider configurado — RESEND_API_KEY ou SMTP_HOST) Para: ${to} | Assunto: ${subject}`);
+    console.log(`[email] (sem provider configurado — RESEND_API_KEY ou SMTP_HOST) Para: ${to} | Assunto: ${subject}${attachments?.length ? ` | ${attachments.length} anexo(s)` : ''}`);
   } catch (e) {
     console.error('[email] envio falhou:', (e as Error).message);
   }
