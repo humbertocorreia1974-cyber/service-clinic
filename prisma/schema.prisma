@@ -418,6 +418,7 @@ model Lead {
   source       String // site_home | servico | catalogo_pecas | contato | blog | whatsapp
   subject      String?
   message      String?
+  photoUrl     String?
   partId       String?
   clientId     String?
   client       Client?   @relation(fields: [clientId], references: [id])
