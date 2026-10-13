@@ -21,6 +21,72 @@ async function extractPaymentId(request: Request): Promise<string | null> {
   return null;
 }
 
+async function handleInvoicePayment(invoiceId: string, payment: any): Promise<boolean> {
+  const invoice = await prisma.invoice.findUnique({ where: { id: invoiceId } });
+  if (!invoice) return false;
+
+  const already = await prisma.payment.findFirst({
+    where: { invoiceId: invoice.id, reference: String(payment.id) },
+  });
+  if (already) return true; // webhook duplicado (MP reenvia) - idempotente
+
+  await prisma.$transaction([
+    prisma.payment.create({
+      data: {
+        invoiceId: invoice.id,
+        amount: payment.transaction_amount ?? invoice.total,
+        method: mapPaymentMethod(payment.payment_type_id),
+        reference: String(payment.id),
+        notes: "Pagamento automático via Mercado Pago",
+      },
+    }),
+    prisma.invoice.update({
+      where: { id: invoice.id },
+      data: { status: "paga", paidAt: new Date() },
+    }),
+  ]);
+  return true;
+}
+
+// 2026-10-13: loja de pecas - pedido com varios itens via carrinho. Ao
+// confirmar pagamento, alem de marcar o PartOrder como "pago", baixa o
+// estoque de cada peca via StockMovement (mesmo padrao usado em saida_os),
+// pra nao duplicar logica de controle de estoque que ja existe no sistema.
+async function handlePartOrderPayment(orderId: string, payment: any): Promise<boolean> {
+  const order = await prisma.partOrder.findUnique({
+    where: { id: orderId },
+    include: { items: true },
+  });
+  if (!order) return false;
+
+  if (order.mpPaymentRef === String(payment.id) || order.status !== "aguardando_pagamento") {
+    return true; // webhook duplicado (MP reenvia) ou pedido já processado - idempotente
+  }
+
+  await prisma.$transaction([
+    prisma.partOrder.update({
+      where: { id: order.id },
+      data: { status: "pago", mpPaymentRef: String(payment.id), paidAt: new Date() },
+    }),
+    ...order.items.flatMap((item) => [
+      prisma.stockMovement.create({
+        data: {
+          partId: item.partId,
+          kind: "saida_venda",
+          quantity: item.quantity,
+          unitCost: item.unitPrice,
+          reason: `Venda online - pedido ${order.code}`,
+        },
+      }),
+      prisma.part.update({
+        where: { id: item.partId },
+        data: { stockQty: { decrement: item.quantity } },
+      }),
+    ]),
+  ]);
+  return true;
+}
+
 export async function POST(request: Request) {
   try {
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
@@ -41,32 +107,16 @@ export async function POST(request: Request) {
     const payment = await getPayment(paymentId);
     if (payment?.status !== "approved") return NextResponse.json({ ok: true });
 
-    const invoiceId = payment.external_reference;
-    if (!invoiceId) return NextResponse.json({ ok: true });
+    const reference = payment.external_reference;
+    if (!reference) return NextResponse.json({ ok: true });
 
-    const invoice = await prisma.invoice.findUnique({ where: { id: invoiceId } });
-    if (!invoice) return NextResponse.json({ ok: true });
-
-    const already = await prisma.payment.findFirst({
-      where: { invoiceId: invoice.id, reference: String(payment.id) },
-    });
-    if (already) return NextResponse.json({ ok: true }); // webhook duplicado (MP reenvia) - idempotente
-
-    await prisma.$transaction([
-      prisma.payment.create({
-        data: {
-          invoiceId: invoice.id,
-          amount: payment.transaction_amount ?? invoice.total,
-          method: mapPaymentMethod(payment.payment_type_id),
-          reference: String(payment.id),
-          notes: "Pagamento automático via Mercado Pago",
-        },
-      }),
-      prisma.invoice.update({
-        where: { id: invoice.id },
-        data: { status: "paga", paidAt: new Date() },
-      }),
-    ]);
+    // O external_reference pode ser o id de uma Invoice (fatura de OS,
+    // fluxo original) ou de um PartOrder (carrinho da loja de peças,
+    // fluxo novo) - tenta os dois, sem presumir qual é.
+    const handledInvoice = await handleInvoicePayment(reference, payment);
+    if (!handledInvoice) {
+      await handlePartOrderPayment(reference, payment);
+    }
 
     return NextResponse.json({ ok: true });
   } catch (__jgnextApiErrorReportErr) {
