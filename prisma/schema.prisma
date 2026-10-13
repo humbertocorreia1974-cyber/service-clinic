@@ -388,6 +388,50 @@ model Part {
   updatedAt      DateTime @updatedAt
 
   stockMovements StockMovement[]
+  orderItems     PartOrderItem[]
+}
+
+// 2026-10-13: loja de pecas estilo Mercado Livre/Shopee - carrinho real com
+// checkout via Mercado Pago (reaproveita lib/mercadopago.ts ja existente,
+// so com multiplos itens por pedido em vez de 1 so). Comprador pode ser
+// anonimo (nao precisa ter Client cadastrado) - por isso dados de
+// contato/entrega ficam direto no pedido, nao via relacao com Client.
+model PartOrder {
+  id              String          @id @default(cuid())
+  code            String          @unique
+  customerName    String
+  customerPhone   String
+  customerEmail   String
+  addressStreet   String?
+  addressNumber   String?
+  addressDistrict String?
+  addressCity     String
+  addressState    String          @default("RJ")
+  addressZip      String?
+  notes           String?
+  subtotal        Decimal         @db.Decimal(10, 2)
+  total           Decimal         @db.Decimal(10, 2)
+  status          String          @default("aguardando_pagamento") // aguardando_pagamento | pago | preparando | enviado | entregue | cancelado
+  mpPaymentRef    String?
+  paidAt          DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  items PartOrderItem[]
+}
+
+model PartOrderItem {
+  id        String    @id @default(cuid())
+  orderId   String
+  order     PartOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  partId    String
+  part      Part      @relation(fields: [partId], references: [id])
+  quantity  Int
+  unitPrice Decimal   @db.Decimal(10, 2)
+  subtotal  Decimal   @db.Decimal(10, 2)
+
+  @@index([orderId])
+  @@index([partId])
 }
 
 model StockMovement {
