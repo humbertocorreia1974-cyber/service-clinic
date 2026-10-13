@@ -56,6 +56,7 @@ function initials(name: string) {
 
 const FOOTER_LINKS = [
   { label: "Serviços", href: "/servicos" },
+  { label: "Orçamento com foto", href: "/orcamento" },
   { label: "Área atendida", href: "/area-atendida" },
   { label: "Catálogo de peças", href: "/pecas" },
   { label: "Sobre", href: "/sobre" },
