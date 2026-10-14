@@ -40,6 +40,15 @@
 // e no "como funciona", e um chip de estatística real do catálogo (nunca dado
 // de cliente específico) no hero. O molde mestre em TEMPLATE_DIR não foi
 // tocado.
+//
+// 🩹 2026-10-14 (pedido direto do Humberto): a loja de peças/acessórios/
+// equipamentos ganhou uma vitrine própria e destacada (seção "Loja", com
+// produtos reais do catálogo) — antes só existia como texto num pilar. Em
+// paralelo, a higienização de ar-condicionado perdeu a foto de destaque que
+// tinha (sempre era o 1º card secundário) e virou um card igual aos outros,
+// no fim da lista — ainda citada, sem chamar atenção. Nenhuma peça real tem
+// foto cadastrada ainda (ver lib/part-categories.ts) — os cards da vitrine
+// usam selo colorido por categoria em vez de inventar uma imagem.
 import Link from "next/link";
 import Image from "next/image";
 import * as Icons from "lucide-react";
@@ -47,6 +56,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { landing } from "@/content/landing";
 import { prisma } from "@/lib/prisma";
+import { categoryMeta } from "@/lib/part-categories";
 import ContactForm from "./contact-form";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -67,11 +77,16 @@ function initials(name: string) {
     .toUpperCase();
 }
 
+function formatBRL(v: unknown) {
+  const n = typeof v === "number" ? v : Number(v ?? 0);
+  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
 const FOOTER_LINKS = [
   { label: "Serviços", href: "/servicos" },
   { label: "Orçamento com foto", href: "/orcamento" },
   { label: "Área atendida", href: "/area-atendida" },
-  { label: "Catálogo de peças", href: "/pecas" },
+  { label: "Loja de peças e equipamentos", href: "/pecas" },
   { label: "Sobre", href: "/sobre" },
   { label: "Blog", href: "/blog" },
   { label: "Contato", href: "/contato" },
@@ -103,7 +118,8 @@ export default async function Home() {
   };
 
   // os 2 pilares reais do negócio (primeiros itens de features) ganham foto;
-  // os secundários (PMOC, laudos, cobertura) ficam como faixa compacta abaixo.
+  // os secundários ficam como faixa compacta abaixo, todos no mesmo nível de
+  // destaque (nenhum item specifico — ex. AC — ganha card/foto maior).
   const pillars = l.features.slice(0, 2);
   const secondary = l.features.slice(2);
   const pillarPhotos = ["/photos/dental-tools.jpg", "/photos/tools-tray.jpg"];
@@ -115,15 +131,26 @@ export default async function Home() {
   // Selo "OS" (ordem de serviço) é a identidade real do negócio - estatística
   // agregada do catálogo (nunca dado de cliente específico) reforça isso no
   // hero sem depender de nenhum registro individual exibido publicamente.
+  // A mesma consulta já serve pra montar a vitrine da loja (1 peça real por
+  // categoria distinta, até 4) — uma query só, sem duplicar acesso ao banco.
   let partsCount = 0;
   let categoriesCount = 0;
+  let featuredParts: { id: string; sku: string; name: string; category: string; salePrice: unknown }[] = [];
   try {
-    const [count, categoryRows] = await Promise.all([
-      prisma.part.count({ where: { active: true, publicVisible: true } }),
-      prisma.part.groupBy({ by: ["category"], where: { active: true, publicVisible: true } }),
-    ]);
-    partsCount = count;
-    categoriesCount = categoryRows.length;
+    const allParts = await prisma.part.findMany({
+      where: { active: true, publicVisible: true },
+      orderBy: { name: "asc" },
+      select: { id: true, sku: true, name: true, category: true, salePrice: true },
+    });
+    partsCount = allParts.length;
+    const seenCategories = new Set<string>();
+    for (const p of allParts) {
+      if (seenCategories.has(p.category)) continue;
+      seenCategories.add(p.category);
+      featuredParts.push(p);
+    }
+    categoriesCount = seenCategories.size;
+    featuredParts = featuredParts.slice(0, 4);
   } catch {
     // catálogo indisponível não pode derrubar a landing
   }
@@ -138,6 +165,7 @@ export default async function Home() {
           </span>
           <nav className="flex shrink-0 items-center gap-1">
             <Link href="#pilares" className="hidden sm:inline-flex"><Button variant="ghost" size="sm">Serviços</Button></Link>
+            {featuredParts.length ? <Link href="#loja" className="hidden sm:inline-flex"><Button variant="ghost" size="sm">Loja</Button></Link> : null}
             {l.agenda?.length ? <Link href="#agenda" className="hidden sm:inline-flex"><Button variant="ghost" size="sm">Agenda</Button></Link> : null}
             <Link href="/login"><Button variant="ghost" size="sm" className="px-2.5 sm:px-3">Entrar</Button></Link>
             <Link href={l.hero.ctaHref ?? "#contato"}>
@@ -167,7 +195,11 @@ export default async function Home() {
             <Link href={l.hero.ctaHref ?? "#contato"}>
               <Button size="lg" className="gap-2 shadow-lg shadow-brand/30">{l.hero.cta || l.hero.ctaText || "Começar grátis"}<ArrowRight className="h-4 w-4" /></Button>
             </Link>
-            {l.hero.ctaSecondary ? (
+            {featuredParts.length ? (
+              <Link href="#loja">
+                <Button variant="secondary" size="lg">Ver loja de peças</Button>
+              </Link>
+            ) : l.hero.ctaSecondary ? (
               <Link href={l.hero.ctaSecondaryHref ?? "#pilares"}>
                 <Button variant="secondary" size="lg">{l.hero.ctaSecondary}</Button>
               </Link>
@@ -185,7 +217,7 @@ export default async function Home() {
             <div className="mt-4 flex flex-wrap gap-3">
               <span className="inline-flex items-center gap-2 rounded-lg border border-dashed border-brand/40 bg-brand/5 px-3 py-1.5 font-mono text-xs text-brand">
                 <Icon name="Package" className="h-3.5 w-3.5" />
-                {partsCount} peças catalogadas{categoriesCount ? ` · ${categoriesCount} categorias de equipamento` : ""}
+                {partsCount} peças, acessórios e equipamentos{categoriesCount ? ` · ${categoriesCount} categorias` : ""}
               </span>
             </div>
           ) : null}
@@ -248,36 +280,69 @@ export default async function Home() {
 
         {secondary.length ? (
           <div className="mt-20 grid gap-6 lg:grid-cols-3">
-            {secondary.map((f: any, fi: number) =>
-              fi === 0 ? (
-                <div key={f.title || fi} className="overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-sm">
-                  <div className="relative h-36 w-full">
-                    <Image
-                      src="/photos/ac-tech.jpg"
-                      alt="Técnico realizando higienização de ar-condicionado em ambiente clínico"
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="border-t-2 border-accent p-5">
-                    <h4 className="text-sm font-semibold text-fg">{f.title || f.name}</h4>
-                    <p className="mt-1 text-sm leading-relaxed text-fg-muted">{f.body || f.description || f.text}</p>
-                  </div>
+            {secondary.map((f: any, fi: number) => (
+              <div key={f.title || fi} className="rounded-2xl border border-border border-t-2 border-t-accent bg-surface-2 p-5 shadow-sm">
+                <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-fg">
+                  <Icon name={f.icon} className="h-5 w-5" />
                 </div>
-              ) : (
-                <div key={f.title || fi} className="rounded-2xl border border-border border-t-2 border-t-accent bg-surface-2 p-5 shadow-sm">
-                  <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-fg">
-                    <Icon name={f.icon} className="h-5 w-5" />
-                  </div>
-                  <h4 className="mt-4 text-sm font-semibold text-fg">{f.title || f.name}</h4>
-                  <p className="mt-1 text-sm leading-relaxed text-fg-muted">{f.body || f.description || f.text}</p>
-                </div>
-              )
-            )}
+                <h4 className="mt-4 text-sm font-semibold text-fg">{f.title || f.name}</h4>
+                <p className="mt-1 text-sm leading-relaxed text-fg-muted">{f.body || f.description || f.text}</p>
+              </div>
+            ))}
           </div>
         ) : null}
       </section>
+
+      {/* LOJA — vitrine real do catálogo (peças, acessórios e equipamentos),
+          pedido direto do Humberto pra dar destaque de verdade a essa área
+          na primeira tela. Produtos reais do banco, não mockup. */}
+      {featuredParts.length ? (
+        <section id="loja" className="border-y border-border bg-surface-2">
+          <div className="mx-auto max-w-6xl px-6 py-24">
+            <div className="flex flex-wrap items-end justify-between gap-6">
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-widest text-accent">Loja Service Clinic</span>
+                <h2 className="mt-2 max-w-xl text-3xl font-semibold tracking-tight text-fg">
+                  Peças, acessórios e equipamentos pra sua clínica, com entrega rápida
+                </h2>
+                <p className="mt-3 max-w-lg text-fg-muted">
+                  Catálogo próprio com SKU e compatibilidade por marca — compre direto pelo site, sem
+                  precisar esperar uma visita técnica.
+                </p>
+              </div>
+              <Link href="/pecas">
+                <Button size="lg" className="gap-2 shadow-lg shadow-brand/30">
+                  Ver catálogo completo<ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {featuredParts.map((p) => {
+                const meta = categoryMeta(p.category);
+                const badgeCls = meta.accent === "brand" ? "bg-brand/10 text-brand" : "bg-accent/10 text-accent";
+                const borderCls = meta.accent === "brand" ? "border-t-brand" : "border-t-accent";
+                return (
+                  <Link
+                    key={p.id}
+                    href="/pecas"
+                    className={`group overflow-hidden rounded-2xl border border-border border-t-2 ${borderCls} bg-surface shadow-sm transition-transform duration-200 hover:-translate-y-1 hover:shadow-md`}
+                  >
+                    <div className={`flex h-28 items-center justify-center ${badgeCls}`}>
+                      <Icon name={meta.icon} className="h-10 w-10" />
+                    </div>
+                    <div className="p-4">
+                      <p className="font-mono text-[11px] text-fg-muted">{p.sku}</p>
+                      <h3 className="mt-1 text-sm font-semibold leading-snug text-fg">{p.name}</h3>
+                      <p className="mt-2 font-display text-base font-bold text-accent">{formatBRL(p.salePrice)}</p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* STEPS — foto real de fundo (consultório) com véu escuro, não é mais cor chapada */}
       {l.steps?.length ? (
