@@ -65,7 +65,11 @@ function NotificationBell() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-lg border border-border bg-surface shadow-lg">
+          {/* 2026-10-14: fixed (nao absolute) - o <nav> pai tem overflow-x-auto,
+              que o CSS trata como clip nos dois eixos quando overflow-y nao e
+              setado explicitamente. absolute cortava o painel dentro do proprio
+              header (confirmado em screenshot). fixed ignora esse ancestral. */}
+          <div className="fixed right-4 top-20 z-50 w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-border bg-surface shadow-lg">
             <div className="flex items-center justify-between border-b border-border px-3 py-2">
               <span className="text-sm font-semibold text-fg">Notificações</span>
               {unread > 0 && (
