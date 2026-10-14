@@ -37,23 +37,25 @@ export default async function ClientesPage() {
       ) : (
         <div className="space-y-3">
           {clients.map((c) => (
-            <Card key={c.id} className="flex items-center justify-between">
-              <div>
-                <CardTitle>{c.nomeFantasia}</CardTitle>
-                <p className="mt-1 text-xs text-fg-muted">
-                  {c.razaoSocial} · {c.addressCity} · {c.phone}
-                </p>
-              </div>
-              <span
-                className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${
-                  c.userId
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                    : "border-border bg-bg text-fg-muted"
-                }`}
-              >
-                {c.userId ? "Com acesso ao portal" : "Sem acesso"}
-              </span>
-            </Card>
+            <Link key={c.id} href={`/clientes/${c.id}`} className="block">
+              <Card className="flex items-center justify-between transition-colors hover:border-brand/40">
+                <div>
+                  <CardTitle>{c.nomeFantasia}</CardTitle>
+                  <p className="mt-1 text-xs text-fg-muted">
+                    {c.razaoSocial} · {c.addressCity} · {c.phone}
+                  </p>
+                </div>
+                <span
+                  className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+                    c.userId
+                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                      : "border-border bg-bg text-fg-muted"
+                  }`}
+                >
+                  {c.userId ? "Com acesso ao portal" : "Sem acesso"}
+                </span>
+              </Card>
+            </Link>
           ))}
         </div>
       )}
