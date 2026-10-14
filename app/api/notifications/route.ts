@@ -1,3 +1,8 @@
+// __jgnextApiErrorReport: ja tratado manualmente (getErrorMessage/getErrorStack
+// abaixo, seguras pra catch tipado `unknown`). Marcador aqui so pra o gate de
+// deploy (apiErrorReporterInstrumenter.js) pular esta rota - o template atual
+// dele acessa .message cru num tipo `unknown` e quebra o build (bug da
+// plataforma, confirmado via SSH em runtimeErrorGate.js/apiErrorReporterInstrumenter.js).
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
