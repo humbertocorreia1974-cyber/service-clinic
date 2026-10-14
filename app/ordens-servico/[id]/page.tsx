@@ -11,6 +11,7 @@ import { AssignClient } from "./assign-client";
 import { SignatureClient } from "./signature-client";
 import { PhotosUploadClient } from "./photos-upload-client";
 import { OsActionsClient } from "./os-actions-client";
+import { MaterialsClient } from "./materials-client";
 
 export const dynamic = "force-dynamic";
 
@@ -123,6 +124,18 @@ export default async function Page({ params }: { params: { id: string } }) {
                   done: c.done,
                   notes: c.notes,
                 }))}
+              />
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardTitle>Materiais</CardTitle>
+            <CardBody>
+              <MaterialsClient
+                serviceOrderId={os.id}
+                materialsPlanned={os.materialsPlanned}
+                materialsUsed={os.materialsUsed}
+                canEdit={canEdit}
               />
             </CardBody>
           </Card>
