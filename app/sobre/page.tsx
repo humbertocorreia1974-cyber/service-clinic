@@ -47,7 +47,13 @@ export default async function SobrePage() {
   const [cidades, servicos, clientesAtivos] = await Promise.all([
     prisma.city.findMany({ where: { active: true }, orderBy: { name: 'asc' } }),
     prisma.service.findMany({ where: { active: true }, orderBy: { order: 'asc' } }),
-    prisma.client.count({ where: { active: true } }),
+    // 🩹 2026-10-13: não contar o registro de QA/teste interno (seed
+    // "cliente.teste@serviceclinic-test.internal") como cliente real nesta
+    // estatística pública — mostrar esse número pra visitante seria uma
+    // prova social falsa.
+    prisma.client.count({
+      where: { active: true, email: { not: { endsWith: '@serviceclinic-test.internal' } } },
+    }),
   ]);
 
   return (
@@ -80,12 +86,6 @@ export default async function SobrePage() {
         <section className="grid gap-4 sm:grid-cols-3">
           <Card>
             <CardBody>
-              <p className="font-display text-3xl font-bold text-brand">{clientesAtivos}</p>
-              <p className="mt-1 text-sm text-fg-muted">Clínicas ativas atendidas</p>
-            </CardBody>
-          </Card>
-          <Card>
-            <CardBody>
               <p className="font-display text-3xl font-bold text-brand">{cidades.length}</p>
               <p className="mt-1 text-sm text-fg-muted">Cidades cobertas no Sul Fluminense</p>
             </CardBody>
@@ -94,6 +94,16 @@ export default async function SobrePage() {
             <CardBody>
               <p className="font-display text-3xl font-bold text-brand">{servicos.length}</p>
               <p className="mt-1 text-sm text-fg-muted">Frentes de serviço especializadas</p>
+            </CardBody>
+          </Card>
+          <Card>
+            <CardBody>
+              <p className="font-display text-3xl font-bold text-brand">
+                {clientesAtivos > 0 ? clientesAtivos : '24h'}
+              </p>
+              <p className="mt-1 text-sm text-fg-muted">
+                {clientesAtivos > 0 ? 'Clínicas ativas atendidas' : 'Prazo de resposta ao orçamento'}
+              </p>
             </CardBody>
           </Card>
         </section>
