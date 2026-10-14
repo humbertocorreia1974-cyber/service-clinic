@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isTechnicianForbidden } from "@/lib/access-control";
 import { getErrorMessage, getErrorStack } from "@/lib/error-info";
 
 export const dynamic = "force-dynamic";
@@ -25,7 +26,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       select: { id: true, serviceOrder: { select: { assignedToId: true } } },
     });
     if (!laudo) return NextResponse.json({ error: "not_found" }, { status: 404 });
-    if (role === "tecnico" && laudo.serviceOrder?.assignedToId !== session.user.id) {
+    if (isTechnicianForbidden(role, laudo.serviceOrder?.assignedToId, session.user.id)) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
 
