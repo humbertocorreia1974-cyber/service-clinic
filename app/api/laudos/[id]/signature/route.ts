@@ -10,7 +10,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    if (!["admin", "gerente", "tecnico"].includes(session.user.role ?? "")) {
+    const role = session.user.role ?? "";
+    if (!["admin", "gerente", "tecnico"].includes(role)) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
 
@@ -19,8 +20,14 @@ export async function POST(request: Request, { params }: { params: { id: string 
       return NextResponse.json({ error: "invalid_body" }, { status: 400 });
     }
 
-    const laudo = await prisma.laudo.findUnique({ where: { id: params.id }, select: { id: true } });
+    const laudo = await prisma.laudo.findUnique({
+      where: { id: params.id },
+      select: { id: true, serviceOrder: { select: { assignedToId: true } } },
+    });
     if (!laudo) return NextResponse.json({ error: "not_found" }, { status: 404 });
+    if (role === "tecnico" && laudo.serviceOrder?.assignedToId !== session.user.id) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    }
 
     const updated = await prisma.laudo.update({
       where: { id: params.id },
