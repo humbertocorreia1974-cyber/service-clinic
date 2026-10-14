@@ -5,33 +5,30 @@ import { prisma } from '@/lib/prisma';
 import { Card, CardBody } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Wrench, Package, Search, ArrowRight } from 'lucide-react';
+import { Wrench, Search, ArrowRight } from 'lucide-react';
+import * as Icons from 'lucide-react';
+import { CATEGORY_OPTIONS, categoryMeta } from '@/lib/part-categories';
 import { AddToCartButton } from './add-to-cart-button';
 import { CartIndicator } from './cart-indicator';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Catálogo de Peças Odontológicas | Service Clinic',
+  title: 'Loja de Peças, Acessórios e Equipamentos | Service Clinic',
   description:
-    'Peças de reposição para cadeiras odontológicas, autoclaves, compressores, raio-X e fotopolimerizadores. Entrega em Volta Redonda, Barra Mansa, Resende, Pinheiral e Barra do Piraí.',
+    'Peças de reposição, acessórios e equipamentos para cadeiras odontológicas, autoclaves, compressores, raio-X e fotopolimerizadores. Entrega em Volta Redonda, Barra Mansa, Resende, Pinheiral e Barra do Piraí.',
   openGraph: {
-    title: 'Catálogo de Peças Odontológicas | Service Clinic',
+    title: 'Loja de Peças, Acessórios e Equipamentos | Service Clinic',
     description:
       'Peças originais e compatíveis para equipamentos odontológicos com entrega no Sul Fluminense.',
     type: 'website',
   },
 };
 
-const CATEGORIES = [
-  { value: '', label: 'Todas as categorias' },
-  { value: 'cadeira', label: 'Cadeira odontológica' },
-  { value: 'autoclave', label: 'Autoclave' },
-  { value: 'compressor', label: 'Compressor' },
-  { value: 'raio_x', label: 'Raio-X' },
-  { value: 'fotopolimerizador', label: 'Fotopolimerizador' },
-  { value: 'geral', label: 'Geral' },
-];
+function CategoryIcon({ name, className }: { name: string; className?: string }) {
+  const C = (Icons as Record<string, any>)[name] ?? Icons.Package;
+  return <C className={className} />;
+}
 
 function formatBRL(v: unknown) {
   const n = typeof v === 'number' ? v : Number(v ?? 0);
@@ -82,12 +79,12 @@ export default async function CatalogoPecasPage({
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="mb-2 inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-3 py-1 text-xs text-fg-muted">
-                <Package className="h-3.5 w-3.5 text-accent" />
-                Catálogo público
+              <p className="mb-2 inline-flex items-center gap-2 rounded-full border border-dashed border-accent bg-accent/5 px-3 py-1 font-mono text-xs text-accent">
+                <Icons.Package className="h-3.5 w-3.5" />
+                Loja Service Clinic
               </p>
               <h1 className="font-display text-3xl font-bold tracking-tight text-fg sm:text-4xl">
-                Peças de reposição para equipamentos odontológicos
+                Peças, acessórios e equipamentos para sua clínica
               </h1>
               <p className="mt-3 max-w-2xl text-fg-muted">
                 Peças originais e compatíveis para cadeiras, autoclaves, compressores, raio-X e
@@ -119,7 +116,7 @@ export default async function CatalogoPecasPage({
             defaultValue={categoria}
             className="rounded-md border border-border bg-bg px-3 py-2 text-sm text-fg outline-none transition-colors duration-150 focus-visible:border-brand"
           >
-            {CATEGORIES.map((c) => (
+            {CATEGORY_OPTIONS.map((c) => (
               <option key={c.value} value={c.value}>
                 {c.label}
               </option>
@@ -146,54 +143,76 @@ export default async function CatalogoPecasPage({
             </CardBody>
           </Card>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {parts.map((p) => (
-              <Card key={p.id} className="flex flex-col">
-                <CardBody className="flex flex-1 flex-col">
-                  <div className="mb-3 flex items-start justify-between gap-2">
-                    <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand">
-                      {CATEGORIES.find((c) => c.value === p.category)?.label ?? p.category}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {parts.map((p) => {
+              const meta = categoryMeta(p.category);
+              const accentBg = meta.accent === 'brand' ? 'bg-brand/10' : 'bg-accent/10';
+              const accentText = meta.accent === 'brand' ? 'text-brand' : 'text-accent';
+              const accentBorder = meta.accent === 'brand' ? 'border-t-brand' : 'border-t-accent';
+              const lowStock = p.stockQty > 0 && p.stockQty <= 3;
+
+              return (
+                <div
+                  key={p.id}
+                  className={`flex flex-col overflow-hidden rounded-2xl border border-border border-t-2 ${accentBorder} bg-surface shadow-sm transition-shadow duration-200 hover:shadow-md`}
+                >
+                  <div className={`relative flex h-36 items-center justify-center ${accentBg}`}>
+                    {p.imageUrl ? (
+                      <Image src={p.imageUrl} alt={p.name} fill sizes="(max-width: 1024px) 50vw, 33vw" className="object-cover" />
+                    ) : (
+                      <CategoryIcon name={meta.icon} className={`h-14 w-14 ${accentText} opacity-80`} />
+                    )}
+                    <span className={`absolute left-3 top-3 rounded-full bg-bg/90 px-2.5 py-0.5 text-xs font-medium ${accentText} shadow-sm`}>
+                      {meta.label}
                     </span>
-                    {p.brand ? (
-                      <span className="text-xs text-fg-muted">{p.brand}</span>
+                    {lowStock ? (
+                      <span className="absolute right-3 top-3 rounded-full border border-dashed border-red-400/60 bg-bg/90 px-2.5 py-0.5 text-xs font-medium text-red-400 shadow-sm">
+                        Últimas {p.stockQty} unid.
+                      </span>
                     ) : null}
                   </div>
-                  <h2 className="font-display text-base font-semibold text-fg">{p.name}</h2>
-                  <p className="mt-1 text-xs text-fg-muted">SKU: {p.sku}</p>
-                  {p.description ? (
-                    <p className="mt-2 line-clamp-3 text-sm text-fg-muted">{p.description}</p>
-                  ) : null}
-                  <div className="mt-4 flex items-end justify-between border-t border-border pt-3">
-                    <div>
-                      <p className="text-xs text-fg-muted">A partir de</p>
-                      <p className="font-display text-lg font-bold text-accent">
-                        {formatBRL(p.salePrice)}
-                      </p>
+
+                  <div className="flex flex-1 flex-col p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-mono text-[11px] text-fg-muted">{p.sku}</p>
+                      {p.brand ? <span className="text-xs text-fg-muted">{p.brand}</span> : null}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <AddToCartButton
-                        partId={p.id}
-                        sku={p.sku}
-                        name={p.name}
-                        unitPrice={Number(p.salePrice)}
-                        imageUrl={p.imageUrl}
-                        stockQty={p.stockQty}
-                      />
-                      <Link
-                        href={`/contato?peca=${encodeURIComponent(p.sku)}&assunto=${encodeURIComponent(
-                          'Orçamento de peça: ' + p.name,
-                        )}`}
-                      >
-                        <Button variant="secondary" size="sm">
-                          Orçamento
-                          <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                        </Button>
-                      </Link>
+                    <h2 className="mt-1 font-display text-base font-semibold text-fg">{p.name}</h2>
+                    {p.description ? (
+                      <p className="mt-2 line-clamp-2 text-sm text-fg-muted">{p.description}</p>
+                    ) : null}
+                    <div className="mt-4 flex items-end justify-between border-t border-border pt-3">
+                      <div>
+                        <p className="text-xs text-fg-muted">A partir de</p>
+                        <p className="font-display text-lg font-bold text-accent">
+                          {formatBRL(p.salePrice)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <AddToCartButton
+                          partId={p.id}
+                          sku={p.sku}
+                          name={p.name}
+                          unitPrice={Number(p.salePrice)}
+                          imageUrl={p.imageUrl}
+                          stockQty={p.stockQty}
+                        />
+                        <Link
+                          href={`/contato?peca=${encodeURIComponent(p.sku)}&assunto=${encodeURIComponent(
+                            'Orçamento de peça: ' + p.name,
+                          )}`}
+                        >
+                          <Button variant="secondary" size="sm">
+                            Orçamento
+                            <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </CardBody>
-              </Card>
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
 
