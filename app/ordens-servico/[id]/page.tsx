@@ -10,6 +10,7 @@ import { ChecklistClient } from "./checklist-client";
 import { AssignClient } from "./assign-client";
 import { SignatureClient } from "./signature-client";
 import { PhotosUploadClient } from "./photos-upload-client";
+import { OsActionsClient } from "./os-actions-client";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       photos: { orderBy: { createdAt: "asc" } },
       signatures: { orderBy: { signedAt: "desc" }, take: 1 },
       laudos: { select: { id: true, code: true, type: true, status: true } },
+      invoiceItems: { select: { id: true } },
     },
   });
 
@@ -258,9 +260,12 @@ export default async function Page({ params }: { params: { id: string } }) {
               <CardTitle>Ações rápidas</CardTitle>
               <CardBody>
                 <div className="flex flex-col gap-2">
-                  <Link href={`/ordens-servico/${os.id}/editar`}>
-                    <Button variant="secondary" size="sm" className="w-full">Editar OS</Button>
-                  </Link>
+                  <OsActionsClient
+                    serviceOrderId={os.id}
+                    status={os.status}
+                    hasInvoice={os.invoiceItems.length > 0}
+                    hasValue={!!os.totalValue && Number(os.totalValue) > 0}
+                  />
                   <Link href={`/laudos/novo?serviceOrderId=${os.id}`}>
                     <Button variant="ghost" size="sm" className="w-full">Emitir laudo</Button>
                   </Link>
