@@ -325,7 +325,7 @@ export default async function Home() {
                 return (
                   <Link
                     key={p.id}
-                    href="/pecas"
+                    href={`/pecas/${p.id}`}
                     className={`group overflow-hidden rounded-2xl border border-border border-t-2 ${borderCls} bg-surface shadow-sm transition-transform duration-200 hover:-translate-y-1 hover:shadow-md`}
                   >
                     <div className={`flex h-28 items-center justify-center ${badgeCls}`}>
