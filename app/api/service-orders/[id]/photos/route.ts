@@ -26,8 +26,11 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: "invalid_body" }, { status: 400 });
   }
 
-  const os = await prisma.serviceOrder.findUnique({ where: { id: params.id }, select: { id: true } });
+  const os = await prisma.serviceOrder.findUnique({ where: { id: params.id }, select: { id: true, assignedToId: true } });
   if (!os) return NextResponse.json({ error: "not_found" }, { status: 404 });
+  if (role === "tecnico" && os.assignedToId !== session.user.id) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
 
   const photo = await prisma.serviceOrderPhoto.create({
     data: {
