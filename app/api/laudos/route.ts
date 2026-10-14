@@ -12,7 +12,8 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    if (!["admin", "gerente", "tecnico"].includes(session.user.role ?? "")) {
+    const role = session.user.role ?? "";
+    if (!["admin", "gerente", "tecnico"].includes(role)) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
 
@@ -36,9 +37,12 @@ export async function POST(request: Request) {
 
     const serviceOrder = await prisma.serviceOrder.findUnique({
       where: { id: serviceOrderId },
-      select: { id: true, clientId: true, equipmentId: true },
+      select: { id: true, clientId: true, equipmentId: true, assignedToId: true },
     });
     if (!serviceOrder) return NextResponse.json({ error: "Ordem de serviço não encontrada." }, { status: 404 });
+    if (role === "tecnico" && serviceOrder.assignedToId !== session.user.id) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    }
 
     const code = `LAUDO-${Date.now().toString(36).toUpperCase()}`;
 
