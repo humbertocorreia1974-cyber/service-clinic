@@ -158,7 +158,8 @@ export default async function CatalogoPecasPage({
                 >
                   <div className={`relative flex h-36 items-center justify-center ${accentBg}`}>
                     {p.imageUrl ? (
-                      <Image src={p.imageUrl} alt={p.name} fill sizes="(max-width: 1024px) 50vw, 33vw" className="object-cover" />
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.imageUrl} alt={p.name} className="h-full w-full object-cover" />
                     ) : (
                       <CategoryIcon name={meta.icon} className={`h-14 w-14 ${accentText} opacity-80`} />
                     )}
