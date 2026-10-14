@@ -61,6 +61,7 @@ export default async function CatalogoPecasPage({
     },
     orderBy: [{ category: 'asc' }, { name: 'asc' }],
     take: 120,
+    include: { reviews: { select: { rating: true } } },
   });
 
   return (
@@ -150,13 +151,17 @@ export default async function CatalogoPecasPage({
               const accentText = meta.accent === 'brand' ? 'text-brand' : 'text-accent';
               const accentBorder = meta.accent === 'brand' ? 'border-t-brand' : 'border-t-accent';
               const lowStock = p.stockQty > 0 && p.stockQty <= 3;
+              const avgRating =
+                p.reviews.length > 0
+                  ? p.reviews.reduce((acc, r) => acc + r.rating, 0) / p.reviews.length
+                  : 0;
 
               return (
                 <div
                   key={p.id}
                   className={`flex flex-col overflow-hidden rounded-2xl border border-border border-t-2 ${accentBorder} bg-surface shadow-sm transition-shadow duration-200 hover:shadow-md`}
                 >
-                  <div className={`relative flex h-36 items-center justify-center ${accentBg}`}>
+                  <Link href={`/pecas/${p.id}`} className={`relative flex h-36 items-center justify-center ${accentBg}`}>
                     {p.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={p.imageUrl} alt={p.name} className="h-full w-full object-cover" />
@@ -171,14 +176,24 @@ export default async function CatalogoPecasPage({
                         Últimas {p.stockQty} unid.
                       </span>
                     ) : null}
-                  </div>
+                  </Link>
 
                   <div className="flex flex-1 flex-col p-4">
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-mono text-[11px] text-fg-muted">{p.sku}</p>
                       {p.brand ? <span className="text-xs text-fg-muted">{p.brand}</span> : null}
                     </div>
-                    <h2 className="mt-1 font-display text-base font-semibold text-fg">{p.name}</h2>
+                    <Link href={`/pecas/${p.id}`} className="mt-1 font-display text-base font-semibold text-fg hover:text-brand">
+                      {p.name}
+                    </Link>
+                    {p.reviews.length > 0 ? (
+                      <div className="mt-1 flex items-center gap-1">
+                        <Icons.Star className="h-3.5 w-3.5 fill-accent text-accent" />
+                        <span className="text-xs text-fg-muted">
+                          {avgRating.toFixed(1)} ({p.reviews.length})
+                        </span>
+                      </div>
+                    ) : null}
                     {p.description ? (
                       <p className="mt-2 line-clamp-2 text-sm text-fg-muted">{p.description}</p>
                     ) : null}
