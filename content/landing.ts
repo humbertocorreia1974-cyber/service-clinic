@@ -14,7 +14,7 @@ export const landing: LandingContent = {
     badge: "Manutenção especializada para consultórios, clínicas e hospitais",
     headline:
       "Manutenção especializada para consultórios odontológicos, clínicas e hospitais no Sul Fluminense",
-    sub: "A Service Clinic cuida da preventiva e corretiva dos equipamentos do seu consultório, clínica ou hospital, com peças de reposição e agenda com marcação automática de horários. Ordens de serviço digitais com checklist, fotos e assinatura em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
+    sub: "A Service Clinic cuida da preventiva e corretiva dos equipamentos do seu consultório, clínica ou hospital, com peças, acessórios e equipamentos para reposição e agenda com marcação automática de horários. Ordens de serviço digitais com checklist, fotos e assinatura em Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
     cta: "Solicitar orçamento agora",
   },
   features: [
@@ -25,13 +25,8 @@ export const landing: LandingContent = {
     },
     {
       icon: "Package",
-      title: "Peças de reposição",
-      body: "Catálogo com SKU, compatibilidade por marca e entrega rápida para toda a região.",
-    },
-    {
-      icon: "Wind",
-      title: "Higienização de ar-condicionado (sub-serviço)",
-      body: "Limpeza técnica de ar-condicionado em ambiente clínico, registrada na ordem de serviço — realizada junto com a manutenção dos equipamentos, nunca como serviço avulso de ar-condicionado comum.",
+      title: "Peças, acessórios e equipamentos",
+      body: "Catálogo próprio com SKU e compatibilidade por marca — peças de reposição, acessórios e equipamentos para consultórios e clínicas, com entrega rápida para toda a região.",
     },
     {
       icon: "FileCheck2",
@@ -42,6 +37,11 @@ export const landing: LandingContent = {
       icon: "MapPin",
       title: "Cobertura regional",
       body: "Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí com técnicos dedicados.",
+    },
+    {
+      icon: "Wind",
+      title: "Limpeza e higienização de ar-condicionado",
+      body: "Feita junto com a manutenção dos equipamentos, nunca como serviço avulso.",
     },
   ],
   steps: [
