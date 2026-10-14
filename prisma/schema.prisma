@@ -373,7 +373,7 @@ model Part {
   sku            String   @unique
   name           String
   description    String?
-  category       String // cadeira | autoclave | compressor | raio_x | fotopolimerizador | geral
+  category       String // cadeira | autoclave | compressor | raio_x | fotopolimerizador | epi | sugadores | pontas_brocas | contra_angulo | protese | implante | ortodontia | consumiveis | geral
   brand          String?
   compatibleWith String[]
   costPrice      Decimal  @db.Decimal(10, 2)
@@ -389,6 +389,23 @@ model Part {
 
   stockMovements StockMovement[]
   orderItems     PartOrderItem[]
+  reviews        PartReview[]
+}
+
+// 2026-10-14: avaliacao de PRODUTO (nao confundir com Review, que e a
+// avaliacao do CLIENTE sobre o atendimento/OS). Loja estilo Mercado Livre
+// precisa de avaliacao por item — publica, sem exigir conta (mesmo padrao
+// de leads/upload: rate limit por IP em vez de sessao).
+model PartReview {
+  id         String   @id @default(cuid())
+  partId     String
+  part       Part     @relation(fields: [partId], references: [id], onDelete: Cascade)
+  authorName String
+  rating     Int // 1 a 5
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  @@index([partId])
 }
 
 // 2026-10-13: loja de pecas estilo Mercado Livre/Shopee - carrinho real com
