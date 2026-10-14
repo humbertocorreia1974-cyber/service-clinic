@@ -15,6 +15,12 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
+  const os = await prisma.serviceOrder.findUnique({ where: { id: params.id }, select: { id: true, assignedToId: true } });
+  if (!os) return NextResponse.json({ error: "not_found" }, { status: 404 });
+  if (role === "tecnico" && os.assignedToId !== session.user.id) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
+
   const body = await request.json().catch(() => null);
   if (!body || typeof body.itemId !== "string" || typeof body.done !== "boolean") {
     return NextResponse.json({ error: "invalid_body" }, { status: 400 });
