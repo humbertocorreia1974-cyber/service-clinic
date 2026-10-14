@@ -59,6 +59,11 @@ export default async function LeadsPage() {
                       <p className="mt-1 text-xs text-fg-muted">
                         {SOURCE_LABEL[lead.source] ?? lead.source} · {new Date(lead.createdAt).toLocaleString("pt-BR")}
                       </p>
+                      {lead.preferredAt && (
+                        <p className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-600">
+                          🗓 Cliente prefere: {new Date(lead.preferredAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
+                        </p>
+                      )}
                       {lead.message && <p className="mt-2 max-w-xl text-sm text-fg">{lead.message}</p>}
                     </div>
                   </div>

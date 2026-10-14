@@ -21,6 +21,7 @@ export function ContactForm() {
       city: String(fd.get("city") ?? "").trim(),
       subject: String(fd.get("subject") ?? "").trim() || null,
       message: String(fd.get("message") ?? "").trim() || null,
+      preferredAt: String(fd.get("preferredAt") ?? "").trim() || null,
       source: "site_home",
     };
     try {
@@ -110,6 +111,15 @@ export function ContactForm() {
           <option value="Contrato de preventiva">Contrato de preventiva</option>
           <option value="Outro">Outro</option>
         </select>
+      </div>
+      <div>
+        <label className="mb-1.5 block text-xs font-medium text-fg-muted">
+          Prefere ser atendido em qual data/horário? (opcional)
+        </label>
+        <Input name="preferredAt" type="datetime-local" />
+        <p className="mt-1 text-[11px] text-fg-muted">
+          É uma preferência, não uma confirmação — nossa equipe entra em contato pra confirmar a visita.
+        </p>
       </div>
       <div>
         <label className="mb-1.5 block text-xs font-medium text-fg-muted">

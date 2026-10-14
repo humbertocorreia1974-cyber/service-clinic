@@ -44,6 +44,7 @@ export function OrcamentoForm() {
       subject: "Orçamento com foto",
       message: String(fd.get("message") ?? "").trim() || null,
       photoUrl,
+      preferredAt: String(fd.get("preferredAt") ?? "").trim() || null,
       source: "orcamento_foto",
     };
     try {
@@ -107,6 +108,15 @@ export function OrcamentoForm() {
           placeholder="Ex: compressor fazendo ruído alto e perdendo pressão desde ontem."
           className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg placeholder:text-fg-muted/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
         />
+      </div>
+      <div>
+        <label className="mb-1.5 block text-xs font-medium text-fg-muted">
+          Prefere ser atendido em qual data/horário? (opcional)
+        </label>
+        <Input name="preferredAt" type="datetime-local" />
+        <p className="mt-1 text-[11px] text-fg-muted">
+          É uma preferência, não uma confirmação — nossa equipe entra em contato pra confirmar a visita.
+        </p>
       </div>
 
       <div>

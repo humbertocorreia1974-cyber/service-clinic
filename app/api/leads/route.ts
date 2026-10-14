@@ -72,10 +72,13 @@ export async function POST(request: Request) {
       },
     });
 
-    // Notifica o time comercial (falha silenciosa — não bloqueia o lead)
+    // Notifica o time comercial por e-mail (falha silenciosa — não bloqueia o lead).
+    // 2026-10-14: o fallback antigo ("comercial@serviceclinic.com.br") era um
+    // domínio que nunca existiu de verdade — nenhum alerta chegava a ninguém.
+    // LEADS_NOTIFY_EMAIL continua podendo sobrescrever quando configurado.
     try {
       const to =
-        process.env.LEADS_NOTIFY_EMAIL ?? "comercial@serviceclinic.com.br";
+        process.env.LEADS_NOTIFY_EMAIL ?? "humbertocorreia1974@gmail.com";
       await sendEmail({
         to,
         subject: `Novo lead: ${subject ?? "Orçamento"} — ${name}`,
@@ -87,6 +90,7 @@ export async function POST(request: Request) {
           ${email ? `<p><strong>E-mail:</strong> ${escapeHtml(email)}</p>` : ""}
           ${subject ? `<p><strong>Assunto:</strong> ${escapeHtml(subject)}</p>` : ""}
           ${message ? `<p><strong>Mensagem:</strong><br/>${escapeHtml(message)}</p>` : ""}
+          ${preferredAt ? `<p><strong>Horário preferido pelo cliente:</strong> ${escapeHtml(preferredAt.toLocaleString("pt-BR"))}</p>` : ""}
           ${photoUrl ? `<p><strong>Foto do problema:</strong><br/><img src="${escapeHtml(photoUrl)}" alt="Foto enviada pelo cliente" style="max-width:320px;border-radius:8px;" /></p>` : ""}
           <p><strong>Origem:</strong> ${escapeHtml(source)}</p>
           <p><a href="${process.env.NEXTAUTH_URL ?? ""}/leads">Ver no painel</a></p>
@@ -94,6 +98,32 @@ export async function POST(request: Request) {
       });
     } catch {
       // ignora erro de e-mail — o lead já está salvo
+    }
+
+    // Notificação in-app pro time (admin/gerente) — o kind "lead_novo" já
+    // existia no schema de Notification mas nunca era usado em lugar nenhum;
+    // sem isso o único rastro de um lead novo era um e-mail que ninguém via.
+    try {
+      const staff = await prisma.user.findMany({
+        where: { role: { in: ["admin", "gerente"] } },
+        select: { id: true },
+      });
+      if (staff.length) {
+        const horario = preferredAt
+          ? ` · prefere ${preferredAt.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}`
+          : "";
+        await prisma.notification.createMany({
+          data: staff.map((u) => ({
+            userId: u.id,
+            title: "Novo lead recebido",
+            body: `${name} · ${city} · ${subject ?? "Orçamento"}${horario}`,
+            kind: "lead_novo",
+            link: "/leads",
+          })),
+        });
+      }
+    } catch {
+      // notificação interna não pode bloquear o lead
     }
 
     return NextResponse.json({ id: lead.id, ok: true }, { status: 201 });

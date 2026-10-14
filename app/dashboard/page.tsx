@@ -12,6 +12,7 @@ const ATALHOS_ADMIN = [
   { href: "/ordens-servico", label: "Ordens de Serviço" },
   { href: "/clientes", label: "Clientes" },
   { href: "/tecnicos", label: "Técnicos" },
+  { href: "/leads", label: "Leads e Orçamentos" },
 ];
 
 export default async function DashboardPage() {
