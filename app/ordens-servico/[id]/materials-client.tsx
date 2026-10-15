@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { postJsonResilient } from "@/lib/offline-queue";
 
 export function MaterialsClient({
   serviceOrderId,
@@ -25,13 +26,17 @@ export function MaterialsClient({
   async function submit() {
     setError(null);
     setMsg(null);
-    const res = await fetch(`/api/service-orders/${serviceOrderId}/materials`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ materialsPlanned: planned, materialsUsed: used }),
-    });
-    if (!res.ok) {
+    const result = await postJsonResilient(
+      `/api/service-orders/${serviceOrderId}/materials`,
+      { materialsPlanned: planned, materialsUsed: used },
+      "Materiais"
+    );
+    if (!result.ok) {
       setError("Falha ao salvar materiais.");
+      return;
+    }
+    if (result.queued) {
+      setMsg("Salvo no aparelho — sincroniza quando a internet voltar.");
       return;
     }
     setMsg("Materiais salvos.");

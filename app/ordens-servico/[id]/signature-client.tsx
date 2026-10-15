@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { postJsonResilient } from "@/lib/offline-queue";
 
 export function SignatureClient({
   serviceOrderId,
@@ -17,6 +18,7 @@ export function SignatureClient({
   const [signerName, setSignerName] = useState("");
   const [signerDocument, setSignerDocument] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const drawing = useRef(false);
 
@@ -59,6 +61,7 @@ export function SignatureClient({
 
   async function submit() {
     setError(null);
+    setMsg(null);
     if (!signerName.trim()) {
       setError("Informe o nome do responsável que está assinando.");
       return;
@@ -66,13 +69,17 @@ export function SignatureClient({
     const c = canvasRef.current;
     if (!c) return;
     const data = c.toDataURL("image/png");
-    const res = await fetch(`/api/service-orders/${serviceOrderId}/signature`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ signerName, signerDocument, signatureData: data }),
-    });
-    if (!res.ok) {
+    const result = await postJsonResilient(
+      `/api/service-orders/${serviceOrderId}/signature`,
+      { signerName, signerDocument, signatureData: data },
+      "Assinatura"
+    );
+    if (!result.ok) {
       setError("Não foi possível registrar a assinatura.");
+      return;
+    }
+    if (result.queued) {
+      setMsg("Assinatura salva no aparelho — sincroniza quando a internet voltar.");
       return;
     }
     startTransition(() => router.refresh());
@@ -112,6 +119,7 @@ export function SignatureClient({
           {pending ? "Registrando..." : "Registrar assinatura"}
         </Button>
       </div>
+      {msg && <p className="text-xs text-emerald-400">{msg}</p>}
       {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   );

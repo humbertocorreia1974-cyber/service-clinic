@@ -1,6 +1,8 @@
 import { JgnextAssistant } from "@/components/jgnext-assistant";
 import CookieConsent from '@/components/cookie-consent';
 import { AppNav } from "@/components/app-nav";
+import { OfflineSyncBanner } from "@/components/offline-sync-banner";
+import { SwRegister } from "@/components/sw-register";
 import type { Metadata } from "next";
 import { Inter, Archivo } from "next/font/google";
 import "./globals.css";
@@ -71,8 +73,13 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen font-sans antialiased">
-        <Providers><AppNav />{children}</Providers>
-              <JgnextAssistant />
+        <Providers>
+          <OfflineSyncBanner />
+          <AppNav />
+          {children}
+        </Providers>
+        <SwRegister />
+        <JgnextAssistant />
         <CookieConsent />
       </body>
     </html>

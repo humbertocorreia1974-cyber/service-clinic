@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { postJsonResilient } from "@/lib/offline-queue";
 
 type Item = {
   id: string;
@@ -25,6 +26,7 @@ export function ChecklistClient({
   const [pending, startTransition] = useTransition();
   const [local, setLocal] = useState(items);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const groups = local.reduce<Record<string, Item[]>>((acc, i) => {
     const g = i.itemGroup ?? "Geral";
@@ -35,16 +37,21 @@ export function ChecklistClient({
   async function toggle(item: Item) {
     if (!canEdit) return;
     setError(null);
+    setNotice(null);
     const next = !item.done;
     setLocal((prev) => prev.map((i) => (i.id === item.id ? { ...i, done: next } : i)));
-    const res = await fetch(`/api/service-orders/${serviceOrderId}/checklist`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ itemId: item.id, done: next }),
-    });
-    if (!res.ok) {
+    const result = await postJsonResilient(
+      `/api/service-orders/${serviceOrderId}/checklist`,
+      { itemId: item.id, done: next },
+      "Checklist"
+    );
+    if (!result.ok) {
       setError("Não foi possível atualizar o item. Tente novamente.");
       setLocal((prev) => prev.map((i) => (i.id === item.id ? { ...i, done: item.done } : i)));
+      return;
+    }
+    if (result.queued) {
+      setNotice("Salvo no aparelho — sincroniza quando a internet voltar.");
       return;
     }
     startTransition(() => router.refresh());
@@ -70,6 +77,7 @@ export function ChecklistClient({
         </div>
       </div>
 
+      {notice && <p className="text-sm text-amber-500">{notice}</p>}
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       {Object.entries(groups).map(([group, list]) => (
