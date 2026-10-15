@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Painel · Service Clinic" };
 
 const ATALHOS_ADMIN = [
+  { href: "/dashboard/negocio", label: "Painel de Negócio" },
   { href: "/ordens-servico", label: "Ordens de Serviço" },
   { href: "/clientes", label: "Clientes" },
   { href: "/tecnicos", label: "Técnicos" },
