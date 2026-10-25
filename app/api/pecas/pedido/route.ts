@@ -59,9 +59,20 @@ export async function POST(request: Request) {
     const subtotal = orderItems.reduce((acc, i) => acc + i.subtotal, 0);
     const code = `PED-${Date.now().toString(36).toUpperCase()}`;
 
+    // Vincula pela FK real quando o e-mail casar com EXATAMENTE UM Client
+    // cadastrado — se houver mais de um (e-mail duplicado) ou nenhum
+    // (visitante anônimo, caso comum nesta loja pública), o pedido segue
+    // sem clientId e o e-mail continua guardado só como campo auxiliar.
+    const matchingClients = await prisma.client.findMany({
+      where: { email: { equals: email, mode: "insensitive" } },
+      select: { id: true },
+    });
+    const clientId = matchingClients.length === 1 ? matchingClients[0].id : null;
+
     const order = await prisma.partOrder.create({
       data: {
         code,
+        clientId,
         customerName: name,
         customerPhone: phone,
         customerEmail: email,

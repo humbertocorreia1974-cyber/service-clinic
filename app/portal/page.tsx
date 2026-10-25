@@ -50,11 +50,17 @@ export default async function PortalPage() {
       orderBy: { createdAt: "desc" },
       take: 30,
     }),
-    // PartOrder não tem FK pro Client — a loja de peças é usada também por
-    // visitantes não logados. Casar por e-mail é o melhor sinal disponível
-    // sem alterar o schema nesta rodada.
+    // PartOrder tem FK real (clientId) pro Client. Mantemos o fallback por
+    // e-mail só para pedidos antigos/anônimos ainda não linkados (a loja de
+    // peças também é usada por visitantes não logados) — ver
+    // scripts/backfill-partorder-clientid.mjs.
     prisma.partOrder.findMany({
-      where: { customerEmail: { equals: client.email, mode: "insensitive" } },
+      where: {
+        OR: [
+          { clientId: client.id },
+          { AND: [{ clientId: null }, { customerEmail: { equals: client.email, mode: "insensitive" } }] },
+        ],
+      },
       orderBy: { createdAt: "desc" },
       take: 20,
     }),

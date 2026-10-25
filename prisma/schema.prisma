@@ -98,6 +98,7 @@ model Client {
   appointments    Appointment[]
   consents        Consent[]
   reviews         Review[]
+  partOrders      PartOrder[]
 
   @@index([insurancePlanId])
 }
@@ -416,9 +417,11 @@ model PartReview {
 model PartOrder {
   id              String          @id @default(cuid())
   code            String          @unique
+  clientId        String?         // FK real pro Client, quando o e-mail do pedido casa com um cliente cadastrado.
+  client          Client?         @relation(fields: [clientId], references: [id])
   customerName    String
   customerPhone   String
-  customerEmail   String
+  customerEmail   String          // mantido como campo auxiliar (exibição / pedidos de visitantes sem Client) — o vinculo de verdade e clientId.
   addressStreet   String?
   addressNumber   String?
   addressDistrict String?
@@ -435,6 +438,8 @@ model PartOrder {
   updatedAt       DateTime        @updatedAt
 
   items PartOrderItem[]
+
+  @@index([clientId])
 }
 
 model PartOrderItem {
