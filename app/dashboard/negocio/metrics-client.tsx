@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardTitle, CardBody } from '@/components/ui/card';
 
@@ -20,6 +20,14 @@ function formatBRL(value: number) {
 export function MetricsClient({ initial }: { initial: Metrics }) {
   const [data, setData] = useState<Metrics>(initial);
   const [loading, setLoading] = useState(false);
+  // 'Atualizado em' só é formatado no client, depois da hidratação: toLocaleString
+  // depende do timezone/locale do runtime, que difere entre servidor e navegador
+  // e causava erro de hidratação (#418/#425) quando formatado direto no JSX.
+  const [updatedLabel, setUpdatedLabel] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUpdatedLabel(new Date(data.geradoEm).toLocaleString('pt-BR'));
+  }, [data.geradoEm]);
 
   async function refresh() {
     setLoading(true);
@@ -35,7 +43,7 @@ export function MetricsClient({ initial }: { initial: Metrics }) {
     <div className="mt-6 space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-xs text-fg-muted">
-          Atualizado em {new Date(data.geradoEm).toLocaleString('pt-BR')}
+          Atualizado em {updatedLabel ?? '—'}
         </p>
         <button
           onClick={refresh}

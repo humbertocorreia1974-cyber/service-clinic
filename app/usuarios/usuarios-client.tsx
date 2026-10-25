@@ -9,26 +9,16 @@ import { Input } from "@/components/ui/input";
 const ROLE_LABEL: Record<string, string> = {
   admin: "Admin",
   gerente: "Gerente",
-  atendente: "Atendente",
-  comercial: "Comercial",
-  vendas: "Vendas",
-  compras: "Compras",
-  financeiro: "Financeiro",
-  engenheiro: "Engenheiro",
   tecnico: "Técnico",
   cliente: "Cliente",
 };
 
-const CREATABLE_ROLES = [
-  "admin",
-  "gerente",
-  "atendente",
-  "comercial",
-  "vendas",
-  "compras",
-  "financeiro",
-  "engenheiro",
-];
+// Papéis que de fato têm comportamento distinto no app (checados em
+// app/api e nas páginas protegidas). "gerente" tem as mesmas permissões
+// de "admin" exceto gerenciar usuários. tecnico/cliente têm fluxo próprio
+// de criação (/tecnicos/novo, /clientes/novo) que gera o registro vinculado
+// (Technician/Client) — por isso não entram aqui como opção nova.
+const CREATABLE_ROLES = ["admin", "gerente"];
 
 type UserRow = { id: string; name: string | null; email: string; role: string; createdAt: string };
 
@@ -171,28 +161,35 @@ export function UsuariosClient({
       ) : null}
 
       <div className="space-y-2">
-        {users.map((u) => (
-          <Card key={u.id} className="flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <p className="truncate font-medium text-fg">
-                {u.name || u.email}
-                {u.id === currentUserId ? <span className="ml-2 text-xs text-accent">(você)</span> : null}
-              </p>
-              <p className="truncate text-xs text-fg-muted">{u.email}</p>
-            </div>
-            <select
-              value={u.role}
-              onChange={(e) => mudarFuncao(u.id, e.target.value)}
-              className="shrink-0 rounded-md border border-border bg-surface px-2 py-1.5 text-xs text-fg outline-none focus-visible:border-brand"
-            >
-              {Object.keys(ROLE_LABEL).map((r) => (
-                <option key={r} value={r}>
-                  {ROLE_LABEL[r]}
-                </option>
-              ))}
-            </select>
-          </Card>
-        ))}
+        {users.map((u) => {
+          // tecnico/cliente têm registro vinculado (Technician/Client) — trocar
+          // o papel deles aqui, fora do fluxo próprio, quebraria esse vínculo.
+          const locked = !CREATABLE_ROLES.includes(u.role);
+          return (
+            <Card key={u.id} className="flex items-center justify-between gap-4">
+              <div className="min-w-0">
+                <p className="truncate font-medium text-fg">
+                  {u.name || u.email}
+                  {u.id === currentUserId ? <span className="ml-2 text-xs text-accent">(você)</span> : null}
+                </p>
+                <p className="truncate text-xs text-fg-muted">{u.email}</p>
+              </div>
+              <select
+                value={u.role}
+                onChange={(e) => mudarFuncao(u.id, e.target.value)}
+                disabled={locked}
+                title={locked ? "Esse papel tem registro vinculado e não muda por aqui." : undefined}
+                className="shrink-0 rounded-md border border-border bg-surface px-2 py-1.5 text-xs text-fg outline-none focus-visible:border-brand disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {(locked ? [u.role] : CREATABLE_ROLES).map((r) => (
+                  <option key={r} value={r}>
+                    {ROLE_LABEL[r] ?? r}
+                  </option>
+                ))}
+              </select>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

@@ -115,10 +115,14 @@ export function AppNav() {
   if (HIDE.some((re) => re.test(pathname)) || status !== 'authenticated') return null;
   const role = (sessionData?.user as any)?.role;
   const showBell = role === 'admin' || role === 'gerente';
+  // 2026-10-25: logo apontava sempre pra /dashboard, que redireciona
+  // silenciosamente cliente -> /portal e tecnico -> /tecnico no servidor.
+  // Fazer o link já apontar pro destino certo evita o salto sem feedback.
+  const homeHref = role === 'cliente' ? '/portal' : role === 'tecnico' ? '/tecnico' : '/dashboard';
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur">
       <nav className="mx-auto flex h-20 max-w-6xl items-center gap-1 overflow-x-auto px-4">
-        <Link href="/dashboard" className="mr-4 flex shrink-0 items-center gap-3 text-lg font-bold tracking-tight">
+        <Link href={homeHref} className="mr-4 flex shrink-0 items-center gap-3 text-lg font-bold tracking-tight">
           <img src="/logo.svg" alt="Service Clinic" className="h-12 w-12 rounded-xl shadow-md shadow-brand/20" />
           Service Clinic
         </Link>
