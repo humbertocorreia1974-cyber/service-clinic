@@ -12,6 +12,7 @@ const ATALHOS_ADMIN = [
   { href: "/dashboard/negocio", label: "Painel de Negócio" },
   { href: "/ordens-servico", label: "Ordens de Serviço" },
   { href: "/ordens-servico/agenda", label: "Agenda da Semana" },
+  { href: "/contratos", label: "Contratos" },
   { href: "/clientes", label: "Clientes" },
   { href: "/tecnicos", label: "Técnicos" },
   { href: "/leads", label: "Leads e Orçamentos" },

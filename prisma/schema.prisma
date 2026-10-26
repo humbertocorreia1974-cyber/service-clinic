@@ -145,36 +145,36 @@ model Equipment {
 }
 
 model ServiceOrder {
-  id           String      @id @default(cuid())
-  code         String      @unique
-  clientId     String
-  client       Client      @relation(fields: [clientId], references: [id])
-  equipmentId  String?
-  equipment    Equipment?  @relation(fields: [equipmentId], references: [id])
-  technicianId String?
-  technician   Technician? @relation(fields: [technicianId], references: [id])
-  createdById  String
-  createdBy    User        @relation("ServiceOrderCreatedBy", fields: [createdById], references: [id])
-  assignedToId String?
-  assignedTo   User?       @relation("ServiceOrderTechnician", fields: [assignedToId], references: [id])
-  type         String // preventiva | corretiva | higienizacao_ac | instalacao | venda_peca
-  status       String      @default("aberta") // aberta | em_andamento | concluida | cancelada
-  priority     String      @default("normal") // baixa | normal | alta | urgente
-  description  String?
-  diagnosis    String?
-  solution     String?
-  scheduledAt  DateTime?
-  startedAt    DateTime?
-  finishedAt   DateTime?
-  city         String
-  address      String?
-  travelFee       Decimal?    @db.Decimal(10, 2) // taxa de deslocamento, informada no orcamento antes da confirmacao
-  totalValue      Decimal?    @db.Decimal(10, 2)
-  clientApprovedAt DateTime?  // cliente aprovou o orcamento/execucao pelo portal
-  materialsPlanned String?    // material previsto, preenchido pelo tecnico antes da execucao
-  materialsUsed    String?    // material realmente usado, preenchido pelo tecnico ao concluir
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id               String      @id @default(cuid())
+  code             String      @unique
+  clientId         String
+  client           Client      @relation(fields: [clientId], references: [id])
+  equipmentId      String?
+  equipment        Equipment?  @relation(fields: [equipmentId], references: [id])
+  technicianId     String?
+  technician       Technician? @relation(fields: [technicianId], references: [id])
+  createdById      String
+  createdBy        User        @relation("ServiceOrderCreatedBy", fields: [createdById], references: [id])
+  assignedToId     String?
+  assignedTo       User?       @relation("ServiceOrderTechnician", fields: [assignedToId], references: [id])
+  type             String // preventiva | corretiva | higienizacao_ac | instalacao | venda_peca
+  status           String      @default("aberta") // aberta | em_andamento | concluida | cancelada
+  priority         String      @default("normal") // baixa | normal | alta | urgente
+  description      String?
+  diagnosis        String?
+  solution         String?
+  scheduledAt      DateTime?
+  startedAt        DateTime?
+  finishedAt       DateTime?
+  city             String
+  address          String?
+  travelFee        Decimal?    @db.Decimal(10, 2) // taxa de deslocamento, informada no orcamento antes da confirmacao
+  totalValue       Decimal?    @db.Decimal(10, 2)
+  clientApprovedAt DateTime? // cliente aprovou o orcamento/execucao pelo portal
+  materialsPlanned String? // material previsto, preenchido pelo tecnico antes da execucao
+  materialsUsed    String? // material realmente usado, preenchido pelo tecnico ao concluir
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 
   checklists     ServiceOrderChecklist[]
   photos         ServiceOrderPhoto[]
@@ -271,12 +271,27 @@ model Contract {
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
-  visits   Visit[]
-  invoices Invoice[]
+  visits     Visit[]
+  invoices   Invoice[]
+  signatures ContractSignature[]
 
   @@index([clientId])
   @@index([equipmentId])
   @@index([createdById])
+}
+
+model ContractSignature {
+  id             String   @id @default(cuid())
+  contractId     String
+  contract       Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  signerName     String
+  signerDocument String?
+  signatureData  String // base64 ou URL do SVG/PNG
+  signedAt       DateTime @default(now())
+  ipAddress      String?
+  userAgent      String?
+
+  @@index([contractId])
 }
 
 model Visit {
@@ -415,27 +430,27 @@ model PartReview {
 // anonimo (nao precisa ter Client cadastrado) - por isso dados de
 // contato/entrega ficam direto no pedido, nao via relacao com Client.
 model PartOrder {
-  id              String          @id @default(cuid())
-  code            String          @unique
-  clientId        String?         // FK real pro Client, quando o e-mail do pedido casa com um cliente cadastrado.
-  client          Client?         @relation(fields: [clientId], references: [id])
+  id              String    @id @default(cuid())
+  code            String    @unique
+  clientId        String? // FK real pro Client, quando o e-mail do pedido casa com um cliente cadastrado.
+  client          Client?   @relation(fields: [clientId], references: [id])
   customerName    String
   customerPhone   String
-  customerEmail   String          // mantido como campo auxiliar (exibição / pedidos de visitantes sem Client) — o vinculo de verdade e clientId.
+  customerEmail   String // mantido como campo auxiliar (exibição / pedidos de visitantes sem Client) — o vinculo de verdade e clientId.
   addressStreet   String?
   addressNumber   String?
   addressDistrict String?
   addressCity     String
-  addressState    String          @default("RJ")
+  addressState    String    @default("RJ")
   addressZip      String?
   notes           String?
-  subtotal        Decimal         @db.Decimal(10, 2)
-  total           Decimal         @db.Decimal(10, 2)
-  status          String          @default("aguardando_pagamento") // aguardando_pagamento | pago | preparando | enviado | entregue | cancelado
+  subtotal        Decimal   @db.Decimal(10, 2)
+  total           Decimal   @db.Decimal(10, 2)
+  status          String    @default("aguardando_pagamento") // aguardando_pagamento | pago | preparando | enviado | entregue | cancelado
   mpPaymentRef    String?
   paidAt          DateTime?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   items PartOrderItem[]
 
