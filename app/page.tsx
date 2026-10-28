@@ -410,6 +410,41 @@ export default async function Home() {
         </section>
       ) : null}
 
+      {/* PROVA REAL DE PRODUTO — dispatch board + assinatura digital, nao so descricao */}
+      <section className="border-y border-border bg-surface-2">
+        <div className="mx-auto max-w-5xl px-6 py-24">
+          <div className="text-center">
+            <span className="text-xs font-semibold uppercase tracking-widest text-accent">Por dentro do sistema</span>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight">Nao e so agenda no papel</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-fg-muted">
+              O que a equipe tecnica e os clientes realmente usam no dia a dia — arraste, confirme, assine.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-5 sm:grid-cols-2">
+            <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+              <div className="inline-flex rounded-lg bg-brand/15 p-2.5">
+                <Icons.CalendarClock className="h-5 w-5 text-brand" />
+              </div>
+              <h3 className="mt-4 text-sm font-semibold text-fg">Painel de despacho com arrastar e soltar</h3>
+              <p className="mt-2 text-sm leading-relaxed text-fg-muted">
+                A equipe reorganiza visitas tecnicas do dia direto no calendario, com checagem automatica de
+                conflito de horario — sem ligacao de ida e volta pra reagendar.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+              <div className="inline-flex rounded-lg bg-brand/15 p-2.5">
+                <Icons.FileSignature className="h-5 w-5 text-brand" />
+              </div>
+              <h3 className="mt-4 text-sm font-semibold text-fg">Assinatura digital no contrato recorrente</h3>
+              <p className="mt-2 text-sm leading-relaxed text-fg-muted">
+                O contrato de manutencao mensal e assinado direto na tela, pelo cliente ou responsavel —
+                sem imprimir, sem escanear, com registro de quando e por quem.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FAIXA DE FOTO — técnico em ação, quebra o ritmo entre agenda e depoimentos */}
       <section className="relative h-64 overflow-hidden sm:h-80">
         <Image

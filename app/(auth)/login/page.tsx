@@ -45,7 +45,7 @@ export default function LoginPage() {
             Bem-vindo de volta.
           </h2>
           <p className="mt-3 max-w-sm text-brand-fg/75">
-            Entre para continuar de onde parou.
+            Entre para acompanhar seus atendimentos e pacientes.
           </p>
           <p className="mt-6 max-w-sm text-sm text-brand-fg/60">
             Um único login para equipe, técnicos e clínicas — cada um cai automaticamente
