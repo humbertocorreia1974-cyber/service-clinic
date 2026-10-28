@@ -418,9 +418,9 @@ export default async function Home() {
         <section className="mx-auto max-w-6xl px-6 py-24">
           <div className="text-center">
             <span className="text-xs font-semibold uppercase tracking-widest text-accent">Por dentro do sistema</span>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-fg">Tecnologia real, nao promessa</h2>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-fg">Tecnologia real, não promessa</h2>
             <p className="mx-auto mt-3 max-w-lg text-fg-muted">
-              O mesmo sistema que organiza nossa operacao tecnica e o que garante prazo e registro pra voce.
+              O mesmo sistema que organiza nossa operação técnica é o que garante prazo e registro pra você.
             </p>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2">
