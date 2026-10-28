@@ -4,6 +4,7 @@ export type LandingContent = {
   features: { icon: string; title: string; body: string }[];
   steps: { title: string; body: string }[];
   agenda: { title: string; body: string }[];
+  proof?: { icon: string; title: string; body: string }[];
   testimonials: { quote: string; name: string; role: string }[];
   faq: { q: string; a: string }[];
 };
@@ -74,6 +75,18 @@ export const landing: LandingContent = {
     {
       title: "Tempo médio de atendimento",
       body: "Cerca de 40 minutos por visita, podendo variar conforme a complexidade do equipamento ou serviço.",
+    },
+  ],
+  proof: [
+    {
+      icon: "CalendarClock",
+      title: "Agenda de despacho com arrasta-e-solta",
+      body: "Cada ordem de serviço é redistribuída entre os técnicos em tempo real, por cidade e horário — sem ligação nem planilha pra remarcar uma visita.",
+    },
+    {
+      icon: "FileSignature",
+      title: "Assinatura digital de contrato",
+      body: "O responsável pela clínica assina o contrato na tela, com validade jurídica — sem imprimir, digitalizar ou trocar PDF por e-mail.",
     },
   ],
   testimonials: [

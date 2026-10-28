@@ -112,6 +112,7 @@ export default async function Home() {
     features: Array.isArray(L.features) ? L.features : [],
     steps: Array.isArray(L.steps) ? L.steps : [],
     agenda: Array.isArray(L.agenda) ? L.agenda : [],
+    proof: Array.isArray(L.proof) ? L.proof : [],
     testimonials: Array.isArray(L.testimonials) ? L.testimonials : [],
     faq: Array.isArray(L.faq) ? L.faq : [],
     cta: L.cta || {},
@@ -410,40 +411,31 @@ export default async function Home() {
         </section>
       ) : null}
 
-      {/* PROVA REAL DE PRODUTO — dispatch board + assinatura digital, nao so descricao */}
-      <section className="border-y border-border bg-surface-2">
-        <div className="mx-auto max-w-5xl px-6 py-24">
+      {/* POR DENTRO DO SISTEMA — prova de produto real: calendario de dispatch
+          (drag-and-drop) e assinatura digital de contrato, construidos e em
+          uso, nunca mostrados na landing ate esta rodada. */}
+      {l.proof.length ? (
+        <section className="mx-auto max-w-6xl px-6 py-24">
           <div className="text-center">
             <span className="text-xs font-semibold uppercase tracking-widest text-accent">Por dentro do sistema</span>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight">Nao e so agenda no papel</h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-fg-muted">
-              O que a equipe tecnica e os clientes realmente usam no dia a dia — arraste, confirme, assine.
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-fg">Tecnologia real, nao promessa</h2>
+            <p className="mx-auto mt-3 max-w-lg text-fg-muted">
+              O mesmo sistema que organiza nossa operacao tecnica e o que garante prazo e registro pra voce.
             </p>
           </div>
-          <div className="mt-12 grid gap-5 sm:grid-cols-2">
-            <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
-              <div className="inline-flex rounded-lg bg-brand/15 p-2.5">
-                <Icons.CalendarClock className="h-5 w-5 text-brand" />
+          <div className="mt-12 grid gap-6 sm:grid-cols-2">
+            {l.proof.map((p: any, pi: number) => (
+              <div key={p.title || pi} className="rounded-2xl border border-border bg-surface p-7 shadow-sm">
+                <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                  <Icon name={p.icon} className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 text-base font-semibold text-fg">{p.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-fg-muted">{p.body}</p>
               </div>
-              <h3 className="mt-4 text-sm font-semibold text-fg">Painel de despacho com arrastar e soltar</h3>
-              <p className="mt-2 text-sm leading-relaxed text-fg-muted">
-                A equipe reorganiza visitas tecnicas do dia direto no calendario, com checagem automatica de
-                conflito de horario — sem ligacao de ida e volta pra reagendar.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
-              <div className="inline-flex rounded-lg bg-brand/15 p-2.5">
-                <Icons.FileSignature className="h-5 w-5 text-brand" />
-              </div>
-              <h3 className="mt-4 text-sm font-semibold text-fg">Assinatura digital no contrato recorrente</h3>
-              <p className="mt-2 text-sm leading-relaxed text-fg-muted">
-                O contrato de manutencao mensal e assinado direto na tela, pelo cliente ou responsavel —
-                sem imprimir, sem escanear, com registro de quando e por quem.
-              </p>
-            </div>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       {/* FAIXA DE FOTO — técnico em ação, quebra o ritmo entre agenda e depoimentos */}
       <section className="relative h-64 overflow-hidden sm:h-80">
