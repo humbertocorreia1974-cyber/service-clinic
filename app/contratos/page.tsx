@@ -38,8 +38,16 @@ export default async function ContratosListPage() {
       <Link href="/dashboard" className="text-sm text-fg-muted hover:text-brand transition-colors">
         ← Painel
       </Link>
-      <div className="mt-2 mb-6">
+      <div className="mt-2 mb-6 flex items-center justify-between">
         <h1 className="font-display text-2xl font-bold text-fg">Contratos</h1>
+        {["admin", "gerente"].includes(role) && (
+          <Link
+            href="/contratos/novo"
+            className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-brand-fg hover:brightness-110"
+          >
+            + Novo contrato
+          </Link>
+        )}
       </div>
 
       {contracts.length === 0 ? (
