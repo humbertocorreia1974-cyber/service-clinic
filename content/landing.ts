@@ -89,26 +89,12 @@ export const landing: LandingContent = {
       body: "O responsável pela clínica assina o contrato na tela, com validade jurídica — sem imprimir, digitalizar ou trocar PDF por e-mail.",
     },
   ],
-  testimonials: [
-    {
-      quote:
-        "Trocamos três fornecedores por um só. A manutenção preventiva acabou com as paradas de cadeira em plena agenda cheia.",
-      name: "Dra. Camila Andrade",
-      role: "Clínica OdontoVida — Volta Redonda",
-    },
-    {
-      quote:
-        "A agenda automática e o checklist digital organizaram nossa manutenção preventiva — hoje sabemos exatamente quando cada equipamento foi revisado.",
-      name: "Rafael Menezes",
-      role: "Clínica Sorriso Real — Barra Mansa",
-    },
-    {
-      quote:
-        "Peça chegou no mesmo dia e o técnico instalou com OS digital. Nunca mais perdi paciente por equipamento parado.",
-      name: "Dra. Patrícia Lopes",
-      role: "OdontoCenter — Resende",
-    },
-  ],
+  // 🩹 2026-11-04: os 3 depoimentos que estavam aqui (Dra. Camila Andrade,
+  // Rafael Menezes, Dra. Patrícia Lopes) eram fabricados — nenhuma dessas
+  // clínicas existe. A seção na app/page.tsx já é condicional
+  // (`l.testimonials?.length ? ... : null`), então array vazio simplesmente
+  // oculta a seção até existir depoimento real de cliente de verdade.
+  testimonials: [],
   faq: [
     {
       q: "Vocês atendem qual região?",
