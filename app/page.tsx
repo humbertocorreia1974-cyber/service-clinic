@@ -60,6 +60,8 @@ import { categoryMeta } from "@/lib/part-categories";
 import ContactForm from "./contact-form";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+export const dynamic = 'force-dynamic';
 const L: any = landing || {};
 
 function Icon({ name, className }: { name?: string; className?: string }) {
@@ -480,6 +482,9 @@ export default async function Home() {
                 </figure>
               ))}
             </div>
+            <p className="mt-6 text-xs text-fg-muted italic">
+              Depoimentos ilustrativos — substitua por relatos reais de clientes antes de publicar.
+            </p>
           </div>
         </section>
       ) : null}
