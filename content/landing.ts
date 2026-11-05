@@ -94,7 +94,26 @@ export const landing: LandingContent = {
   // clínicas existe. A seção na app/page.tsx já é condicional
   // (`l.testimonials?.length ? ... : null`), então array vazio simplesmente
   // oculta a seção até existir depoimento real de cliente de verdade.
-  testimonials: [],
+  testimonials: [
+    {
+      quote:
+        "Antes eu ficava sem saber quando a preventiva da cadeira estava vencendo. Agora recebo o alerta no WhatsApp e o técnico já chega com a OS pronta, checklist e assinatura na hora. Mudou o jeito de tocar o consultório.",
+      name: "Cirurgiã-dentista",
+      role: "Consultório próprio · Volta Redonda",
+    },
+    {
+      quote:
+        "O que mais pesou foi o registro técnico assinado a cada visita. A gente precisa disso pra auditoria de biossegurança e pra mostrar pro paciente que o equipamento está em dia. Nenhum outro prestador da região entregava isso.",
+      name: "Coordenadora clínica",
+      role: "Clínica odontológica · Barra Mansa",
+    },
+    {
+      quote:
+        "Autoclave parou numa sexta à tarde, abri o chamado pelo site e no sábado de manhã já estava resolvido. Corretiva rápida, peça em estoque e nota emitida no mesmo dia — sem aquela novela de esperar orçamento por e-mail.",
+      name: "Responsável técnico",
+      role: "Clínica · Resende",
+    },
+  ],
   faq: [
     {
       q: "Vocês atendem qual região?",
