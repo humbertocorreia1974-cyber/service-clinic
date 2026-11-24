@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { Inter, Archivo } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import GuidePill from "@/components/guide-pill";
 
 const body = Inter({ subsets: ["latin"], weight: ["400","700"], variable: "--font-sans", display: "swap" });
 const display = Archivo({ subsets: ["latin"], weight: ["400","700"], variable: "--font-display", display: "swap" });
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   title: "Service Clinic — Manutenção especializada para consultórios odontológicos",
   description: "Manutenção preventiva e corretiva de equipamentos odontológicos e revenda de peças. Atendemos Volta Redonda, Pinheiral, Barra Mansa, Resende e Barra do Piraí.",
   openGraph: {
-    title: "Service Clinic",
+    title: "Service Clinic — Seu equipamento pronto, sua clínica sempre aberta",
     description: "Manutenção especializada para consultórios odontológicos no Sul Fluminense.",
     images: ["/og-image.png"],
     url: SITE_URL,
@@ -81,6 +82,7 @@ export default function RootLayout({
         <SwRegister />
         <JgnextAssistant />
         <CookieConsent />
+        <GuidePill />
         <a href="https://www.jgnext.com" target="_blank" rel="noopener" className="fixed bottom-2 left-2 z-40 rounded-full bg-black/80 px-3 py-1 text-[11px] text-white/80 backdrop-blur hover:text-white transition-colors">Feito com JGNEXT</a>
       </body>
     </html>

@@ -86,6 +86,7 @@ function formatBRL(v: unknown) {
 
 const FOOTER_LINKS = [
   { label: "Serviços", href: "/servicos" },
+  { label: "Como usar a plataforma", href: "/primeiros-passos" },
   { label: "Orçamento com foto", href: "/orcamento" },
   { label: "Área atendida", href: "/area-atendida" },
   { label: "Loja de peças e equipamentos", href: "/pecas" },
@@ -164,7 +165,7 @@ export default async function Home() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-5">
           <span className="flex min-w-0 flex-1 items-center gap-2 text-base font-bold tracking-tight sm:flex-none sm:gap-3 sm:text-2xl">
             <img src="/logo.svg" alt={l.name} className="h-11 w-11 shrink-0 rounded-xl shadow-lg shadow-brand/20 sm:h-16 sm:w-16" />
-            <span className="truncate">{l.name}</span>
+            <span className="flex min-w-0 flex-col leading-tight"><span className="truncate">{l.name}</span>{landing.slogan ? <span className="hidden truncate text-xs font-medium text-accent sm:block">{landing.slogan}</span> : null}</span>
           </span>
           <nav className="flex shrink-0 items-center gap-1">
             <Link href="#pilares" className="hidden sm:inline-flex"><Button variant="ghost" size="sm">Serviços</Button></Link>
@@ -532,6 +533,7 @@ export default async function Home() {
                 <img src="/logo.svg" alt={l.name} className="h-11 w-11 rounded-lg" />
                 {l.name}
               </span>
+              {landing.slogan ? <p className="mt-2 text-sm font-semibold text-accent">{landing.slogan}</p> : null}
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-fg-muted">
                 Manutenção especializada para consultórios odontológicos, clínicas e hospitais no Sul Fluminense.
               </p>

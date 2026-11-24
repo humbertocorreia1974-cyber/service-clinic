@@ -1,5 +1,6 @@
 export type LandingContent = {
   name: string;
+  slogan?: string;
   hero: { badge: string; headline: string; sub: string; cta: string };
   features: { icon: string; title: string; body: string }[];
   steps: { title: string; body: string }[];
@@ -11,6 +12,7 @@ export type LandingContent = {
 
 export const landing: LandingContent = {
   name: "Service Clinic",
+  slogan: "Seu equipamento pronto, sua clínica sempre aberta.",
   hero: {
     badge: "Manutenção especializada para consultórios, clínicas e hospitais",
     headline:
