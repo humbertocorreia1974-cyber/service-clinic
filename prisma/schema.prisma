@@ -394,6 +394,7 @@ model Part {
   compatibleWith String[]
   costPrice      Decimal  @db.Decimal(10, 2)
   salePrice      Decimal  @db.Decimal(10, 2)
+  weightGrams    Int      @default(500)
   stockQty       Int      @default(0)
   minStockQty    Int      @default(0)
   unit           String   @default("un")
@@ -449,12 +450,35 @@ model PartOrder {
   status          String          @default("aguardando_pagamento") // aguardando_pagamento | pago | preparando | enviado | entregue | cancelado
   mpPaymentRef    String?
   paidAt          DateTime?
+  // logistica (2026-11-24): entrega, rastreio e linha do tempo
+  shippingMethod    String? // retirada | entrega_local | transportadora
+  shippingCost      Decimal   @default(0) @db.Decimal(10, 2)
+  carrier           String?
+  trackingCode      String?
+  estimatedDelivery DateTime?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+  cancelledAt       DateTime?
+  stockReleased     Boolean   @default(false) // true quando o estoque reservado voltou (cancelamento/expiracao)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
-  items PartOrderItem[]
+  items  PartOrderItem[]
+  events PartOrderEvent[]
 
   @@index([clientId])
+}
+
+model PartOrderEvent {
+  id        String    @id @default(cuid())
+  orderId   String
+  order     PartOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    String
+  note      String?
+  createdBy String?
+  createdAt DateTime  @default(now())
+
+  @@index([orderId])
 }
 
 model PartOrderItem {

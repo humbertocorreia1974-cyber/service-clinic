@@ -24,7 +24,10 @@ export default async function EstoquePage() {
       <Link href="/dashboard" className="text-sm text-fg-muted hover:text-brand transition-colors">
         ← Painel
       </Link>
-      <h1 className="mt-2 mb-1 font-display text-2xl font-bold text-fg">Estoque de peças</h1>
+      <div className="mt-2 mb-1 flex flex-wrap items-end justify-between gap-2">
+        <h1 className="font-display text-2xl font-bold text-fg">Estoque de peças</h1>
+        <Link href="/pecas/pedidos" className="text-sm font-medium text-brand underline-offset-4 hover:underline">Pedidos da loja →</Link>
+      </div>
       <p className="mb-6 text-sm text-fg-muted">
         {parts.length} peça(s) ativa(s). Itens em vermelho estão no ou abaixo do estoque mínimo.
       </p>

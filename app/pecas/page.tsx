@@ -93,7 +93,10 @@ export default async function CatalogoPecasPage({
                 Sul Fluminense.
               </p>
             </div>
-            <CartIndicator />
+            <div className="flex items-center gap-4">
+              <Link href="/pecas/rastreio" className="text-sm text-fg-muted underline-offset-4 hover:text-brand hover:underline">Acompanhar pedido</Link>
+              <CartIndicator />
+            </div>
           </div>
         </div>
       </header>

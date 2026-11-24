@@ -58,32 +58,36 @@ async function handlePartOrderPayment(orderId: string, payment: any): Promise<bo
     include: { items: true },
   });
   if (!order) return false;
+  if (order.mpPaymentRef === String(payment.id)) return true; // webhook duplicado (MP reenvia) - idempotente
 
-  if (order.mpPaymentRef === String(payment.id) || order.status !== "aguardando_pagamento") {
-    return true; // webhook duplicado (MP reenvia) ou pedido já processado - idempotente
+  if (order.status === "aguardando_pagamento") {
+    // o estoque já foi reservado na criação do pedido: aqui só confirma o pagamento
+    await prisma.$transaction([
+      prisma.partOrder.update({ where: { id: order.id }, data: { status: "pago", mpPaymentRef: String(payment.id), paidAt: new Date() } }),
+      prisma.partOrderEvent.create({ data: { orderId: order.id, status: "pago", note: "Pagamento confirmado pelo Mercado Pago" } }),
+    ]);
+    return true;
   }
 
-  await prisma.$transaction([
-    prisma.partOrder.update({
-      where: { id: order.id },
-      data: { status: "pago", mpPaymentRef: String(payment.id), paidAt: new Date() },
-    }),
-    ...order.items.flatMap((item) => [
-      prisma.stockMovement.create({
-        data: {
-          partId: item.partId,
-          kind: "saida_venda",
-          quantity: item.quantity,
-          unitCost: item.unitPrice,
-          reason: `Venda online - pedido ${order.code}`,
-        },
-      }),
-      prisma.part.update({
-        where: { id: item.partId },
-        data: { stockQty: { decrement: item.quantity } },
-      }),
-    ]),
-  ]);
+  if (order.status === "cancelado") {
+    // pagou depois de a reserva expirar: tenta reservar de novo; sem saldo, a equipe precisa reembolsar
+    try {
+      await prisma.$transaction(async (tx) => {
+        for (const item of order.items) {
+          const r = await tx.part.updateMany({ where: { id: item.partId, stockQty: { gte: item.quantity } }, data: { stockQty: { decrement: item.quantity } } });
+          if (r.count === 0) throw new Error("sem estoque");
+          await tx.stockMovement.create({ data: { partId: item.partId, kind: "saida_venda", quantity: item.quantity, unitCost: item.unitPrice, reason: `Reserva retomada - pedido ${order.code}` } });
+        }
+        await tx.partOrder.update({ where: { id: order.id }, data: { status: "pago", mpPaymentRef: String(payment.id), paidAt: new Date(), cancelledAt: null, stockReleased: false } });
+        await tx.partOrderEvent.create({ data: { orderId: order.id, status: "pago", note: "Pagamento recebido após a reserva expirar — estoque reservado novamente" } });
+      });
+    } catch {
+      await prisma.$transaction([
+        prisma.partOrder.update({ where: { id: order.id }, data: { mpPaymentRef: String(payment.id), paidAt: new Date() } }),
+        prisma.partOrderEvent.create({ data: { orderId: order.id, status: "cancelado", note: "ATENÇÃO: pagamento recebido após o cancelamento e sem estoque — reembolsar no Mercado Pago" } }),
+      ]);
+    }
+  }
   return true;
 }
 
