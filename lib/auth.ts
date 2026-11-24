@@ -1,4 +1,5 @@
 import type { NextAuthOptions } from "next-auth";
+import { verifyBrokerAssertion, userFromGoogle } from "@/lib/jgnext-google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
@@ -9,6 +10,20 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   pages: { signIn: "/login" },
   providers: [
+    // jgnext-google
+    CredentialsProvider({
+      id: "jgnext-google",
+      name: "Google",
+      credentials: { assertion: { label: "assertion", type: "text" } },
+      async authorize(credentials, req) {
+        const assertion = credentials?.assertion;
+        const host = (req?.headers?.["x-forwarded-host"] || req?.headers?.host || "").toString().split(",")[0].trim();
+        if (!assertion || !host) return null;
+        const profile = await verifyBrokerAssertion(assertion, host);
+        if (!profile) return null;
+        return await userFromGoogle(profile);
+      },
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {

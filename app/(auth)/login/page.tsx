@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { GoogleLoginButton } from "@/components/google-login-button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
@@ -84,6 +85,7 @@ export default function LoginPage() {
               {loading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
+          <GoogleLoginButton />
 
           <p className="mt-6 text-center text-xs text-fg-muted">
             Sem conta? Sua conta é criada por um administrador da empresa.
