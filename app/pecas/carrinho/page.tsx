@@ -202,7 +202,13 @@ export default function CarrinhoPage() {
                           <span className="font-semibold text-fg">{o.cost === 0 ? "Grátis" : formatBRL(o.cost)}</span>
                         </span>
                         <span className="block text-xs text-fg-muted">
-                          {o.etaDays[1] === 0 ? "Hoje" : o.etaDays[0] === o.etaDays[1] ? `${o.etaDays[1]} dia(s) útil(eis)` : `${o.etaDays[0]} a ${o.etaDays[1]} dias úteis`} · {o.note}
+                          {o.etaDays[1] === 0
+                            ? "Hoje"
+                            : o.etaDays[0] === 0
+                              ? `Pronto em até ${o.etaDays[1]} dia útil`
+                              : o.etaDays[0] === o.etaDays[1]
+                                ? `${o.etaDays[1]} dias úteis`
+                                : `${o.etaDays[0]} a ${o.etaDays[1]} dias úteis`} · {o.note}
                         </span>
                       </span>
                     </label>
