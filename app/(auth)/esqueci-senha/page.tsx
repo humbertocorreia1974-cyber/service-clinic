@@ -1,6 +1,9 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { AuthShell } from '@/components/auth-shell';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export default function EsqueciSenhaPage() {
   const [email, setEmail] = useState('');
@@ -16,17 +19,21 @@ export default function EsqueciSenhaPage() {
   }
 
   return (
-    <main style={{ maxWidth: 400, margin: '4rem auto', padding: '0 1.5rem' }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Esqueci minha senha</h1>
+    <AuthShell title="Esqueci minha senha" subtitle="Informe o e-mail da sua conta e enviaremos um link para criar uma nova senha.">
       {sent ? (
-        <p>Se esse e-mail existir na nossa base, você vai receber um link pra redefinir a senha.</p>
+        <p className="rounded-md border border-border bg-surface-2 px-3 py-3 text-sm text-fg">
+          Se esse e-mail existir na nossa base, você vai receber um link para redefinir a senha. Confira também a caixa de spam.
+        </p>
       ) : (
-        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <input type="email" required placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} style={{ padding: 10, borderRadius: 8, border: '1px solid #ddd' }} />
-          <button type="submit" disabled={loading} style={{ padding: 10, borderRadius: 8, border: 0, background: '#111827', color: '#fff', cursor: 'pointer' }}>{loading ? 'Enviando…' : 'Enviar link de redefinição'}</button>
+        <form onSubmit={submit} className="space-y-4">
+          <div>
+            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-fg">E-mail</label>
+            <Input id="email" type="email" required placeholder="voce@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </div>
+          <Button type="submit" disabled={loading} className="w-full">{loading ? 'Enviando…' : 'Enviar link de redefinição'}</Button>
         </form>
       )}
-      <p style={{ marginTop: 16 }}><Link href="/login">Voltar pro login</Link></p>
-    </main>
+      <p className="mt-6 text-sm"><Link href="/login" className="text-fg-muted transition-colors hover:text-brand">← Voltar para o login</Link></p>
+    </AuthShell>
   );
 }
